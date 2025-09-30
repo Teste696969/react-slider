@@ -26,7 +26,9 @@ export default function App() {
   const [authorFilter, setAuthorFilter] = useState<string>('')
   const [genreFilter, setGenreFilter] = useState<string>('')
   const [pmvAuthorFilter, setPmvAuthorFilter] = useState<string>('')
+  const [pmvGenreFilter, setPmvGenreFilter] = useState<string>('')
   const [realAuthorFilter, setRealAuthorFilter] = useState<string>('')
+  const [realGenreFilter, setRealGenreFilter] = useState<string>('')
   const [isRandom, setIsRandom] = useState<boolean>(true)
   const [isLoop, setIsLoop] = useState<boolean>(false)
 
@@ -39,10 +41,12 @@ export default function App() {
       const authorMatch = !authorFilter || (isR34(v) && v.autor === authorFilter)
       const genreMatch = !genreFilter || (isR34(v) && v.categoria === genreFilter)
       const pmvAuthorMatch = !pmvAuthorFilter || (isPMV(v) && !isREAL(v) && v.autor === pmvAuthorFilter)
+      const pmvGenreMatch = !pmvGenreFilter || (isPMV(v) && !isREAL(v) && v.categoria === pmvGenreFilter)
       const realAuthorMatch = !realAuthorFilter || (isREAL(v) && v.autor === realAuthorFilter)
-      return authorMatch && genreMatch && pmvAuthorMatch && realAuthorMatch
+      const realGenreMatch = !realGenreFilter || (isREAL(v) && v.categoria === realGenreFilter)
+      return authorMatch && genreMatch && pmvAuthorMatch && pmvGenreMatch && realAuthorMatch && realGenreMatch
     })
-  }, [videos, authorFilter, genreFilter, pmvAuthorFilter, realAuthorFilter, isR34, isPMV, isREAL])
+  }, [videos, authorFilter, genreFilter, pmvAuthorFilter, pmvGenreFilter, realAuthorFilter, realGenreFilter, isR34, isPMV, isREAL])
 
   const [currentIndex, setCurrentIndex] = useState<number>(0)
   const [, setQueue] = useState<number[]>([])
@@ -219,7 +223,7 @@ export default function App() {
     }
   }, [onKeyDown])
 
-  
+  // progress percentage now handled via CSS variable --progress-position
 
   const seekToClientX = useCallback((clientX: number) => {
     const container = controlsRef.current
@@ -253,7 +257,9 @@ export default function App() {
   const authors = useMemo(() => Array.from(new Set(videos.filter(v => isR34(v)).map(v => v.autor))).sort(), [videos, isR34])
   const genres = useMemo(() => Array.from(new Set(videos.filter(v => isR34(v)).map(v => v.categoria))).sort(), [videos, isR34])
   const pmvAuthors = useMemo(() => Array.from(new Set(videos.filter(v => isPMV(v) && !isREAL(v)).map(v => v.autor))).sort(), [videos, isPMV, isREAL])
+  const pmvGenres = useMemo(() => Array.from(new Set(videos.filter(v => isPMV(v) && !isREAL(v)).map(v => v.categoria))).sort(), [videos, isPMV, isREAL])
   const realAuthors = useMemo(() => Array.from(new Set(videos.filter(v => isREAL(v)).map(v => v.autor))).sort(), [videos, isREAL])
+  const realGenres = useMemo(() => Array.from(new Set(videos.filter(v => isREAL(v)).map(v => v.categoria))).sort(), [videos, isREAL])
 
   const currentId = useMemo(() => {
     if (!current) return ''
@@ -296,11 +302,29 @@ export default function App() {
               </div>
             </li>
             <li className="nav-item dropdown">
+              <a className="nav-link dropdown-toggle" href="#" id="pmvGenresDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Genre R34 PMV</a>
+              <div className="dropdown-menu" aria-labelledby="pmvGenresDropdown">
+                <a className="dropdown-item" href="#" onClick={(e) => { e.preventDefault(); setPmvGenreFilter('') }}>All R34 PMV Genres</a>
+                {pmvGenres.map(g => (
+                  <a key={g} className="dropdown-item" href="#" onClick={(e) => { e.preventDefault(); setPmvGenreFilter(g) }}>{g}</a>
+                ))}
+              </div>
+            </li>
+            <li className="nav-item dropdown">
               <a className="nav-link dropdown-toggle" href="#" id="realAuthorsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Authors REAL</a>
               <div className="dropdown-menu" aria-labelledby="realAuthorsDropdown">
-                <a className="dropdown-item" href="#" onClick={(e) => { e.preventDefault(); setRealAuthorFilter('') }}>All REAL Genres</a>
+                <a className="dropdown-item" href="#" onClick={(e) => { e.preventDefault(); setRealAuthorFilter('') }}>All REAL Authors</a>
                 {realAuthors.map(a => (
                   <a key={a} className="dropdown-item" href="#" onClick={(e) => { e.preventDefault(); setRealAuthorFilter(a) }}>{a}</a>
+                ))}
+              </div>
+            </li>
+            <li className="nav-item dropdown">
+              <a className="nav-link dropdown-toggle" href="#" id="realGenreDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Genre REAL</a>
+              <div className="dropdown-menu" aria-labelledby="realGenreDropdown">
+                <a className="dropdown-item" href="#" onClick={(e) => { e.preventDefault(); setRealGenreFilter('') }}>All REAL Genres</a>
+                {realGenres.map(g => (
+                  <a key={g} className="dropdown-item" href="#" onClick={(e) => { e.preventDefault(); setRealGenreFilter(g) }}>{g}</a>
                 ))}
               </div>
             </li>

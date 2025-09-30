@@ -27,7 +27,6 @@ export default function App() {
   const [genreFilter, setGenreFilter] = useState<string>('')
   const [pmvAuthorFilter, setPmvAuthorFilter] = useState<string>('')
   const [realAuthorFilter, setRealAuthorFilter] = useState<string>('')
-  const [realGenreFilter, setRealGenreFilter] = useState<string>('')
   const [isRandom, setIsRandom] = useState<boolean>(true)
   const [isLoop, setIsLoop] = useState<boolean>(false)
 
@@ -41,10 +40,9 @@ export default function App() {
       const genreMatch = !genreFilter || (isR34(v) && v.categoria === genreFilter)
       const pmvAuthorMatch = !pmvAuthorFilter || (isPMV(v) && !isREAL(v) && v.autor === pmvAuthorFilter)
       const realAuthorMatch = !realAuthorFilter || (isREAL(v) && v.autor === realAuthorFilter)
-      const realGenreMatch = !realGenreFilter || (isREAL(v) && v.categoria === realGenreFilter)
-      return authorMatch && genreMatch && pmvAuthorMatch && realAuthorMatch && realGenreMatch
+      return authorMatch && genreMatch && pmvAuthorMatch && realAuthorMatch
     })
-  }, [videos, authorFilter, genreFilter, pmvAuthorFilter, realAuthorFilter, realGenreFilter, isR34, isPMV, isREAL])
+  }, [videos, authorFilter, genreFilter, pmvAuthorFilter, realAuthorFilter, isR34, isPMV, isREAL])
 
   const [currentIndex, setCurrentIndex] = useState<number>(0)
   const [, setQueue] = useState<number[]>([])
@@ -256,7 +254,6 @@ export default function App() {
   const genres = useMemo(() => Array.from(new Set(videos.filter(v => isR34(v)).map(v => v.categoria))).sort(), [videos, isR34])
   const pmvAuthors = useMemo(() => Array.from(new Set(videos.filter(v => isPMV(v) && !isREAL(v)).map(v => v.autor))).sort(), [videos, isPMV, isREAL])
   const realAuthors = useMemo(() => Array.from(new Set(videos.filter(v => isREAL(v)).map(v => v.autor))).sort(), [videos, isREAL])
-  const realGenres = useMemo(() => Array.from(new Set(videos.filter(v => isREAL(v)).map(v => v.categoria))).sort(), [videos, isREAL])
 
   const currentId = useMemo(() => {
     if (!current) return ''
@@ -301,18 +298,9 @@ export default function App() {
             <li className="nav-item dropdown">
               <a className="nav-link dropdown-toggle" href="#" id="realAuthorsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Authors REAL</a>
               <div className="dropdown-menu" aria-labelledby="realAuthorsDropdown">
-                <a className="dropdown-item" href="#" onClick={(e) => { e.preventDefault(); setRealAuthorFilter('') }}>All REAL Authors</a>
+                <a className="dropdown-item" href="#" onClick={(e) => { e.preventDefault(); setRealAuthorFilter('') }}>All REAL Genres</a>
                 {realAuthors.map(a => (
                   <a key={a} className="dropdown-item" href="#" onClick={(e) => { e.preventDefault(); setRealAuthorFilter(a) }}>{a}</a>
-                ))}
-              </div>
-            </li>
-            <li className="nav-item dropdown">
-              <a className="nav-link dropdown-toggle" href="#" id="realGenreDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Genre REAL</a>
-              <div className="dropdown-menu" aria-labelledby="realGenreDropdown">
-                <a className="dropdown-item" href="#" onClick={(e) => { e.preventDefault(); setRealGenreFilter('') }}>All REAL Genres</a>
-                {realGenres.map(g => (
-                  <a key={g} className="dropdown-item" href="#" onClick={(e) => { e.preventDefault(); setRealGenreFilter(g) }}>{g}</a>
                 ))}
               </div>
             </li>

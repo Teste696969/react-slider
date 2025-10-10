@@ -23,30 +23,67 @@ function useFetchVideos() {
 export default function App() {
   const { videos } = useFetchVideos()
 
-  const [authorFilter, setAuthorFilter] = useState<string>('')
-  const [genreFilter, setGenreFilter] = useState<string>('')
-  const [pmvAuthorFilter, setPmvAuthorFilter] = useState<string>('')
-  const [pmvGenreFilter, setPmvGenreFilter] = useState<string>('')
-  const [realAuthorFilter, setRealAuthorFilter] = useState<string>('')
-  const [realGenreFilter, setRealGenreFilter] = useState<string>('')
+  const [selectedArtists, setSelectedArtists] = useState<string[]>([])
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([])
+  const [artistInput, setArtistInput] = useState<string>('')
+  const [categoryInput, setCategoryInput] = useState<string>('')
+  const [showArtistDropdown, setShowArtistDropdown] = useState<boolean>(false)
+  const [showCategoryDropdown, setShowCategoryDropdown] = useState<boolean>(false)
   const [isRandom, setIsRandom] = useState<boolean>(true)
   const [isLoop, setIsLoop] = useState<boolean>(false)
 
-  const isPMV = useCallback((v: VideoItem) => v.categoria?.toLowerCase() === 'pmv', [])
-  const isREAL = useCallback((v: VideoItem) => v.categoria?.toLowerCase() === 'real', [])
-  const isR34 = useCallback((v: VideoItem) => !isPMV(v) && !isREAL(v), [isPMV, isREAL])
+  // Get unique artists and categories for suggestions
+  const allArtists = useMemo(() => Array.from(new Set(videos.map(v => v.autor))).sort(), [videos])
+  const allCategories = useMemo(() => Array.from(new Set(videos.map(v => v.categoria))).sort(), [videos])
+
+  // Filter suggestions based on input
+  const artistSuggestions = useMemo(() => {
+    if (!artistInput) return allArtists
+    return allArtists.filter(a =>
+      a.toLowerCase().includes(artistInput.toLowerCase()) &&
+      !selectedArtists.includes(a)
+    )
+  }, [allArtists, artistInput, selectedArtists])
+
+  const categorySuggestions = useMemo(() => {
+    if (!categoryInput) return allCategories
+    return allCategories.filter(c =>
+      c.toLowerCase().includes(categoryInput.toLowerCase()) &&
+      !selectedCategories.includes(c)
+    )
+  }, [allCategories, categoryInput, selectedCategories])
 
   const filtered = useMemo(() => {
     return videos.filter(v => {
-      const authorMatch = !authorFilter || (isR34(v) && v.autor === authorFilter)
-      const genreMatch = !genreFilter || (isR34(v) && v.categoria === genreFilter)
-      const pmvAuthorMatch = !pmvAuthorFilter || (isPMV(v) && !isREAL(v) && v.autor === pmvAuthorFilter)
-      const pmvGenreMatch = !pmvGenreFilter || (isPMV(v) && !isREAL(v) && v.categoria === pmvGenreFilter)
-      const realAuthorMatch = !realAuthorFilter || (isREAL(v) && v.autor === realAuthorFilter)
-      const realGenreMatch = !realGenreFilter || (isREAL(v) && v.categoria === realGenreFilter)
-      return authorMatch && genreMatch && pmvAuthorMatch && pmvGenreMatch && realAuthorMatch && realGenreMatch
+      const artistMatch = selectedArtists.length === 0 || selectedArtists.includes(v.autor)
+      const categoryMatch = selectedCategories.length === 0 || selectedCategories.includes(v.categoria)
+      return artistMatch && categoryMatch
     })
-  }, [videos, authorFilter, genreFilter, pmvAuthorFilter, pmvGenreFilter, realAuthorFilter, realGenreFilter, isR34, isPMV, isREAL])
+  }, [videos, selectedArtists, selectedCategories])
+
+  const removeArtist = useCallback((artist: string) => {
+    setSelectedArtists(prev => prev.filter(a => a !== artist))
+  }, [])
+
+  const removeCategory = useCallback((category: string) => {
+    setSelectedCategories(prev => prev.filter(c => c !== category))
+  }, [])
+
+  const addArtist = useCallback((artist: string) => {
+    if (!selectedArtists.includes(artist)) {
+      setSelectedArtists(prev => [...prev, artist])
+      setArtistInput('')
+      setShowArtistDropdown(false)
+    }
+  }, [selectedArtists])
+
+  const addCategory = useCallback((category: string) => {
+    if (!selectedCategories.includes(category)) {
+      setSelectedCategories(prev => [...prev, category])
+      setCategoryInput('')
+      setShowCategoryDropdown(false)
+    }
+  }, [selectedCategories])
 
   const [currentIndex, setCurrentIndex] = useState<number>(0)
   const [, setQueue] = useState<number[]>([])
@@ -254,12 +291,7 @@ export default function App() {
     document.addEventListener('mouseup', onUp)
   }, [seekToClientX])
 
-  const authors = useMemo(() => Array.from(new Set(videos.filter(v => isR34(v)).map(v => v.autor))).sort(), [videos, isR34])
-  const genres = useMemo(() => Array.from(new Set(videos.filter(v => isR34(v)).map(v => v.categoria))).sort(), [videos, isR34])
-  const pmvAuthors = useMemo(() => Array.from(new Set(videos.filter(v => isPMV(v) && !isREAL(v)).map(v => v.autor))).sort(), [videos, isPMV, isREAL])
-  const pmvGenres = useMemo(() => Array.from(new Set(videos.filter(v => isPMV(v) && !isREAL(v)).map(v => v.categoria))).sort(), [videos, isPMV, isREAL])
-  const realAuthors = useMemo(() => Array.from(new Set(videos.filter(v => isREAL(v)).map(v => v.autor))).sort(), [videos, isREAL])
-  const realGenres = useMemo(() => Array.from(new Set(videos.filter(v => isREAL(v)).map(v => v.categoria))).sort(), [videos, isREAL])
+  // Removed unused allArtists and allCategories
 
   const currentId = useMemo(() => {
     if (!current) return ''
@@ -271,64 +303,125 @@ export default function App() {
   return (
     <div>
       <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
-        <a className="navbar-brand" href="#">NHere</a>
         <div className="collapse navbar-collapse show">
-          <ul className="navbar-nav mr-auto">
-            <li className="nav-item dropdown">
-              <a className="nav-link dropdown-toggle" href="#" id="authorDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Authors R34</a>
-              <div className="dropdown-menu" aria-labelledby="authorDropdown">
-                <a className="dropdown-item" href="#" onClick={(e) => { e.preventDefault(); setAuthorFilter('') }}>All R34 Authors</a>
-                {authors.map(a => (
-                  <a key={a} className="dropdown-item" href="#" onClick={(e) => { e.preventDefault(); setAuthorFilter(a) }}>{a}</a>
-                ))}
+          <div className="filter-section" style={{ padding: '10px 0', display: 'flex', gap: '20px' }}>
+            <div className="filter-group" style={{ flex: 1, position: 'relative' }}>
+              <div className="filter-input-container" style={{ position: 'relative', display: "flex", flexDirection: "column", gap: "5px" }}>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Search artists..."
+                  value={artistInput}
+                  onChange={e => {
+                    setArtistInput(e.target.value)
+                    setShowArtistDropdown(true)
+                  }}
+                  onFocus={() => setShowArtistDropdown(true)}
+                  onBlur={() => setTimeout(() => setShowArtistDropdown(false), 200)}
+                />
+                <div className="selected-filters" style={{ marginBottom: 8 }}>
+                  {selectedArtists.map(artist => (
+                    <span key={artist} className="filter-pill" style={{
+                      background: '#ff8533',
+                      color: 'white',
+                      padding: '4px 8px',
+                      borderRadius: 15,
+                      margin: '0 4px 4px 0',
+                      display: 'inline-block',
+                      cursor: 'pointer'
+                    }}>
+                      {artist} <span onClick={() => removeArtist(artist)} style={{ marginLeft: 4 }}>×</span>
+                    </span>
+                  ))}
+                </div>
+                {showArtistDropdown && artistSuggestions.length > 0 && (
+                  <div className="dropdown-menu show" style={{
+                    position: 'absolute',
+                    width: '100%',
+                    maxHeight: '200px',
+                    overflowY: 'auto',
+                    background: '#343a40',
+                    border: '1px solid #454d55',
+                    zIndex: 1000
+                  }}>
+                    {artistSuggestions.map(artist => (
+                      <a
+                        key={artist}
+                        className="dropdown-item"
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault()
+                          addArtist(artist)
+                        }}
+                        style={{ color: '#fff' }}
+                      >
+                        {artist}
+                      </a>
+                    ))}
+                  </div>
+                )}
               </div>
-            </li>
-            <li className="nav-item dropdown">
-              <a className="nav-link dropdown-toggle" href="#" id="genreDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Genre R34</a>
-              <div className="dropdown-menu" aria-labelledby="genreDropdown">
-                <a className="dropdown-item" href="#" onClick={(e) => { e.preventDefault(); setGenreFilter('') }}>All R34 Genres</a>
-                {genres.map(g => (
-                  <a key={g} className="dropdown-item" href="#" onClick={(e) => { e.preventDefault(); setGenreFilter(g) }}>{g}</a>
-                ))}
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+              <div className="filter-input-container" style={{ position: 'relative' }}>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Search categories..."
+                  value={categoryInput}
+                  onChange={e => {
+                    setCategoryInput(e.target.value)
+                    setShowCategoryDropdown(true)
+                  }}
+                  onFocus={() => setShowCategoryDropdown(true)}
+                  onBlur={() => setTimeout(() => setShowCategoryDropdown(false), 200)}
+                />
+                {showCategoryDropdown && categorySuggestions.length > 0 && (
+                  <div className="dropdown-menu show" style={{
+                    position: 'absolute',
+                    width: '100%',
+                    maxHeight: '200px',
+                    overflowY: 'auto',
+                    background: '#343a40',
+                    border: '1px solid #454d55',
+                    zIndex: 1000
+                  }}>
+                    {categorySuggestions.map(category => (
+                      <a
+                        key={category}
+                        className="dropdown-item"
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault()
+                          addCategory(category)
+                        }}
+                        style={{ color: '#fff' }}
+                      >
+                        {category}
+                      </a>
+                    ))}
+                  </div>
+                )}
               </div>
-            </li>
-            <li className="nav-item dropdown">
-              <a className="nav-link dropdown-toggle" href="#" id="pmvAuthorsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Authors R34 PMV</a>
-              <div className="dropdown-menu" aria-labelledby="pmvAuthorsDropdown">
-                <a className="dropdown-item" href="#" onClick={(e) => { e.preventDefault(); setPmvAuthorFilter('') }}>All R34 PMV Authors</a>
-                {pmvAuthors.map(a => (
-                  <a key={a} className="dropdown-item" href="#" onClick={(e) => { e.preventDefault(); setPmvAuthorFilter(a) }}>{a}</a>
-                ))}
+              <div className="filter-group" style={{ flex: 1, position: 'relative' }}>
+                <div className="selected-filters" style={{ marginBottom: 8 }}>
+                  {selectedCategories.map(category => (
+                    <span key={category} className="filter-pill" style={{
+                      background: '#ff8533',
+                      color: 'white',
+                      padding: '4px 8px',
+                      borderRadius: 15,
+                      margin: '0 4px 4px 0',
+                      display: 'inline-block',
+                      cursor: 'pointer'
+                    }}>
+                      {category} <span onClick={() => removeCategory(category)} style={{ marginLeft: 4 }}>×</span>
+                    </span>
+                  ))}
+                </div>
               </div>
-            </li>
-            <li className="nav-item dropdown">
-              <a className="nav-link dropdown-toggle" href="#" id="pmvGenresDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Genre R34 PMV</a>
-              <div className="dropdown-menu" aria-labelledby="pmvGenresDropdown">
-                <a className="dropdown-item" href="#" onClick={(e) => { e.preventDefault(); setPmvGenreFilter('') }}>All R34 PMV Genres</a>
-                {pmvGenres.map(g => (
-                  <a key={g} className="dropdown-item" href="#" onClick={(e) => { e.preventDefault(); setPmvGenreFilter(g) }}>{g}</a>
-                ))}
-              </div>
-            </li>
-            <li className="nav-item dropdown">
-              <a className="nav-link dropdown-toggle" href="#" id="realAuthorsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Authors REAL</a>
-              <div className="dropdown-menu" aria-labelledby="realAuthorsDropdown">
-                <a className="dropdown-item" href="#" onClick={(e) => { e.preventDefault(); setRealAuthorFilter('') }}>All REAL Authors</a>
-                {realAuthors.map(a => (
-                  <a key={a} className="dropdown-item" href="#" onClick={(e) => { e.preventDefault(); setRealAuthorFilter(a) }}>{a}</a>
-                ))}
-              </div>
-            </li>
-            <li className="nav-item dropdown">
-              <a className="nav-link dropdown-toggle" href="#" id="realGenreDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Genre REAL</a>
-              <div className="dropdown-menu" aria-labelledby="realGenreDropdown">
-                <a className="dropdown-item" href="#" onClick={(e) => { e.preventDefault(); setRealGenreFilter('') }}>All REAL Genres</a>
-                {realGenres.map(g => (
-                  <a key={g} className="dropdown-item" href="#" onClick={(e) => { e.preventDefault(); setRealGenreFilter(g) }}>{g}</a>
-                ))}
-              </div>
-            </li>
-          </ul>
+            </div>
+          </div>
         </div>
       </nav>
 
@@ -344,7 +437,7 @@ export default function App() {
             </div>
           </div>
 
-          <div ref={containerRef} className={`video-container ${showControls ? '': 'paused'} ${isScrubbing ? 'scrubbing' : ''}`} data-volume-level={muted ? 'muted' : volume >= 0.5 ? 'high' : 'low'} style={{ cursor: showControls ? 'default' : 'none' }}>
+          <div ref={containerRef} className={`video-container ${showControls ? '' : 'paused'} ${isScrubbing ? 'scrubbing' : ''}`} data-volume-level={muted ? 'muted' : volume >= 0.5 ? 'high' : 'low'} style={{ cursor: showControls ? 'default' : 'none' }}>
             <div ref={controlsRef} className="video-controls-container" style={{ opacity: showControls ? 1 : 0 }}>
               <div className="timeline-container">
                 <div

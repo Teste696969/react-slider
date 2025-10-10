@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 
 type VideoPart = { url: string }
 type VideoItem = {
@@ -18,6 +19,152 @@ function useFetchVideos() {
       .catch(e => setError(String(e)))
   }, [])
   return { videos, error }
+}
+
+function Gallery() {
+  const { videos } = useFetchVideos();
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 28; // 4x7 grid
+
+  const totalPages = Math.ceil(videos.length / itemsPerPage);
+  const paginatedVideos = videos.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
+  return (
+    <div style={{ padding: '40px', backgroundColor: '#121212', color: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <div
+        className="gallery-container"
+        style={{
+          width: '90%',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(4, 1fr)',
+          gap: '14px',
+          justifyContent: 'center',
+        }}
+      >
+        {paginatedVideos.map((video, index) => (
+          <div
+            key={index}
+            className="video-card"
+            style={{
+              border: '1px solid #333',
+              borderRadius: '8px',
+              overflow: 'hidden',
+              background: '#1e1e1e',
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.5)',
+              transition: 'transform 0.2s',
+              height: '340px',
+              width: '100%',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'scale(1.05)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'scale(1)';
+            }}
+          >
+            <video
+              src={video.url || video.parts?.[0]?.url}
+              controls
+              style={{ width: '100%', height: '250px', objectFit: 'cover' }}
+            />
+            <div
+              className="video-info"
+              style={{ padding: '10px', textAlign: 'center' }}
+            >
+              <h3
+                style={{
+                  fontSize: '18px',
+                  margin: '0 0 5px',
+                  color: '#ff8533',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                }}
+              >
+                {video.autor}
+              </h3>
+              <p
+                style={{
+                  fontSize: '14px',
+                  color: '#aaa',
+                  margin: '0',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                }}
+              >
+                {video.categoria}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div
+        className="pagination"
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          marginTop: '20px',
+          gap: '10px',
+        }}
+      >
+        <button
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+          style={{
+            padding: '10px 15px',
+            background: '#333',
+            color: '#fff',
+            border: '1px solid #444',
+            borderRadius: '4px',
+            cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
+          }}
+        >
+          Previous
+        </button>
+        {Array.from({ length: totalPages }, (_, index) => (
+          <button
+            key={index}
+            onClick={() => handlePageChange(index + 1)}
+            style={{
+              padding: '10px 15px',
+              background: currentPage === index + 1 ? '#ff8533' : '#333',
+              color: currentPage === index + 1 ? '#fff' : '#aaa',
+              border: '1px solid #444',
+              borderRadius: '4px',
+              cursor: 'pointer',
+            }}
+          >
+            {index + 1}
+          </button>
+        ))}
+        <button
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          style={{
+            padding: '10px 15px',
+            background: '#333',
+            color: '#fff',
+            border: '1px solid #444',
+            borderRadius: '4px',
+            cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
+          }}
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  );
 }
 
 export default function App() {
@@ -291,8 +438,6 @@ export default function App() {
     document.addEventListener('mouseup', onUp)
   }, [seekToClientX])
 
-  // Removed unused allArtists and allCategories
-
   const currentId = useMemo(() => {
     if (!current) return ''
     const raw = current.url ? current.url : current.parts?.[0]?.url || ''
@@ -301,199 +446,206 @@ export default function App() {
   }, [current])
 
   return (
-    <div>
-      <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div className="collapse navbar-collapse show">
-          <div className="filter-section" style={{ padding: '10px 0', display: 'flex', gap: '20px' }}>
-            <div className="filter-group" style={{ flex: 1, position: 'relative' }}>
-              <div className="filter-input-container" style={{ position: 'relative', display: "flex", flexDirection: "column", gap: "5px" }}>
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Search artists..."
-                  value={artistInput}
-                  onChange={e => {
-                    setArtistInput(e.target.value)
-                    setShowArtistDropdown(true)
-                  }}
-                  onFocus={() => setShowArtistDropdown(true)}
-                  onBlur={() => setTimeout(() => setShowArtistDropdown(false), 200)}
-                />
-                <div className="selected-filters" style={{ marginBottom: 8 }}>
-                  {selectedArtists.map(artist => (
-                    <span key={artist} className="filter-pill" style={{
-                      background: '#ff8533',
-                      color: 'white',
-                      padding: '4px 8px',
-                      borderRadius: 15,
-                      margin: '0 4px 4px 0',
-                      display: 'inline-block',
-                      cursor: 'pointer'
-                    }}>
-                      {artist} <span onClick={() => removeArtist(artist)} style={{ marginLeft: 4 }}>×</span>
-                    </span>
-                  ))}
-                </div>
-                {showArtistDropdown && artistSuggestions.length > 0 && (
-                  <div className="dropdown-menu show" style={{
-                    position: 'absolute',
-                    width: '100%',
-                    maxHeight: '200px',
-                    overflowY: 'auto',
-                    background: '#343a40',
-                    border: '1px solid #454d55',
-                    zIndex: 1000
-                  }}>
-                    {artistSuggestions.map(artist => (
-                      <a
-                        key={artist}
-                        className="dropdown-item"
-                        href="#"
-                        onClick={(e) => {
-                          e.preventDefault()
-                          addArtist(artist)
+    <Router>
+      <Routes>
+        <Route path="/gallery" element={<Gallery />} />
+        <Route path="/" element={
+          <div>
+            <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
+              <div className="collapse navbar-collapse show">
+                <div className="filter-section" style={{ padding: '10px 0', display: 'flex', gap: '20px' }}>
+                  <div className="filter-group" style={{ flex: 1, position: 'relative' }}>
+                    <div className="filter-input-container" style={{ position: 'relative', display: "flex", flexDirection: "column", gap: "5px" }}>
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Search artists..."
+                        value={artistInput}
+                        onChange={e => {
+                          setArtistInput(e.target.value)
+                          setShowArtistDropdown(true)
                         }}
-                        style={{ color: '#fff' }}
-                      >
-                        {artist}
-                      </a>
-                    ))}
+                        onFocus={() => setShowArtistDropdown(true)}
+                        onBlur={() => setTimeout(() => setShowArtistDropdown(false), 200)}
+                      />
+                      <div className="selected-filters" style={{ marginBottom: 8 }}>
+                        {selectedArtists.map(artist => (
+                          <span key={artist} className="filter-pill" style={{
+                            background: '#ff8533',
+                            color: 'white',
+                            padding: '4px 8px',
+                            borderRadius: 15,
+                            margin: '0 4px 4px 0',
+                            display: 'inline-block',
+                            cursor: 'pointer'
+                          }}>
+                            {artist} <span onClick={() => removeArtist(artist)} style={{ marginLeft: 4 }}>×</span>
+                          </span>
+                        ))}
+                      </div>
+                      {showArtistDropdown && artistSuggestions.length > 0 && (
+                        <div className="dropdown-menu show" style={{
+                          position: 'absolute',
+                          width: '100%',
+                          maxHeight: '200px',
+                          overflowY: 'auto',
+                          background: '#343a40',
+                          border: '1px solid #454d55',
+                          zIndex: 1000
+                        }}>
+                          {artistSuggestions.map(artist => (
+                            <a
+                              key={artist}
+                              className="dropdown-item"
+                              href="#"
+                              onClick={(e) => {
+                                e.preventDefault()
+                                addArtist(artist)
+                              }}
+                              style={{ color: '#fff' }}
+                            >
+                              {artist}
+                            </a>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
-                )}
-              </div>
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
-              <div className="filter-input-container" style={{ position: 'relative' }}>
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Search categories..."
-                  value={categoryInput}
-                  onChange={e => {
-                    setCategoryInput(e.target.value)
-                    setShowCategoryDropdown(true)
-                  }}
-                  onFocus={() => setShowCategoryDropdown(true)}
-                  onBlur={() => setTimeout(() => setShowCategoryDropdown(false), 200)}
-                />
-                {showCategoryDropdown && categorySuggestions.length > 0 && (
-                  <div className="dropdown-menu show" style={{
-                    position: 'absolute',
-                    width: '100%',
-                    maxHeight: '200px',
-                    overflowY: 'auto',
-                    background: '#343a40',
-                    border: '1px solid #454d55',
-                    zIndex: 1000
-                  }}>
-                    {categorySuggestions.map(category => (
-                      <a
-                        key={category}
-                        className="dropdown-item"
-                        href="#"
-                        onClick={(e) => {
-                          e.preventDefault()
-                          addCategory(category)
+                  <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+                    <div className="filter-input-container" style={{ position: 'relative' }}>
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Search categories..."
+                        value={categoryInput}
+                        onChange={e => {
+                          setCategoryInput(e.target.value)
+                          setShowCategoryDropdown(true)
                         }}
-                        style={{ color: '#fff' }}
-                      >
-                        {category}
-                      </a>
-                    ))}
+                        onFocus={() => setShowCategoryDropdown(true)}
+                        onBlur={() => setTimeout(() => setShowCategoryDropdown(false), 200)}
+                      />
+                      {showCategoryDropdown && categorySuggestions.length > 0 && (
+                        <div className="dropdown-menu show" style={{
+                          position: 'absolute',
+                          width: '100%',
+                          maxHeight: '200px',
+                          overflowY: 'auto',
+                          background: '#343a40',
+                          border: '1px solid #454d55',
+                          zIndex: 1000
+                        }}>
+                          {categorySuggestions.map(category => (
+                            <a
+                              key={category}
+                              className="dropdown-item"
+                              href="#"
+                              onClick={(e) => {
+                                e.preventDefault()
+                                addCategory(category)
+                              }}
+                              style={{ color: '#fff' }}
+                            >
+                              {category}
+                            </a>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    <div className="filter-group" style={{ flex: 1, position: 'relative' }}>
+                      <div className="selected-filters" style={{ marginBottom: 8 }}>
+                        {selectedCategories.map(category => (
+                          <span key={category} className="filter-pill" style={{
+                            background: '#ff8533',
+                            color: 'white',
+                            padding: '4px 8px',
+                            borderRadius: 15,
+                            margin: '0 4px 4px 0',
+                            display: 'inline-block',
+                            cursor: 'pointer'
+                          }}>
+                            {category} <span onClick={() => removeCategory(category)} style={{ marginLeft: 4 }}>×</span>
+                          </span>
+                        ))}
+                      </div>
+                    </div>
                   </div>
-                )}
+                </div>
               </div>
-              <div className="filter-group" style={{ flex: 1, position: 'relative' }}>
-                <div className="selected-filters" style={{ marginBottom: 8 }}>
-                  {selectedCategories.map(category => (
-                    <span key={category} className="filter-pill" style={{
-                      background: '#ff8533',
-                      color: 'white',
-                      padding: '4px 8px',
-                      borderRadius: 15,
-                      margin: '0 4px 4px 0',
-                      display: 'inline-block',
-                      cursor: 'pointer'
-                    }}>
-                      {category} <span onClick={() => removeCategory(category)} style={{ marginLeft: 4 }}>×</span>
-                    </span>
-                  ))}
+            </nav>
+
+            <div className="container-main mt-5">
+              <div>
+                <div className="video-title-container">
+                  <div className="video-urls-container">
+                    <h5 className="video-url" onClick={() => { if (currentId) window.open(current?.url || current?.parts?.[0]?.url || '#', '_blank') }}>{currentId}</h5>
+                    <h5> - </h5>
+                    <h5 className="artist-url" onClick={() => { if (current?.autor) window.open(`https://www.google.com/search?q=${encodeURIComponent(current.autor)} rule34`, '_blank') }}>{current?.autor || ''}</h5>
+                    <h5> - </h5>
+                    <h5 className="video-title">{current?.categoria || ''}</h5>
+                  </div>
+                </div>
+
+                <div ref={containerRef} className={`video-container ${showControls ? '' : 'paused'} ${isScrubbing ? 'scrubbing' : ''}`} data-volume-level={muted ? 'muted' : volume >= 0.5 ? 'high' : 'low'} style={{ cursor: showControls ? 'default' : 'none' }}>
+                  <div ref={controlsRef} className="video-controls-container" style={{ opacity: showControls ? 1 : 0 }}>
+                    <div className="timeline-container">
+                      <div
+                        className="timeline"
+                        style={{ ['--progress-position' as any]: (duration ? currentTime / duration : 0) }}
+                        onMouseDown={onTimelineMouseDown}
+                        onClick={(e) => seekToClientX(e.clientX)}
+                      >
+                        <div className="thumb-indicator"></div>
+                      </div>
+                    </div>
+                    <div className="controls">
+                      <button id="prev-button" onClick={onPrev}><i className="fa-solid fa-backward"></i></button>
+                      <button className="play-pause-btn" onClick={onTogglePlay}>
+                        <i className="play-icon fa-solid fa-play" style={{ display: isPlaying ? 'none' : 'inline-block' }}></i>
+                        <i className="pause-icon fa-solid fa-pause" style={{ display: isPlaying ? 'inline-block' : 'none' }}></i>
+                      </button>
+                      <button id="next-button" onClick={onNext}><i className="fa-solid fa-forward"></i></button>
+                      <div className="volume-container">
+                        <button className="mute-btn" onClick={onToggleMute}>
+                          <i className="volume-high-icon fa-solid fa-volume-high"></i>
+                          <i className="volume-low-icon fa-solid fa-volume-low"></i>
+                          <i className="volume-muted-icon fa-solid fa-volume-off"></i>
+                        </button>
+                        <input className="volume-slider" type="range" min="0" max="1" step="any" value={volume} onChange={(e) => onVolumeChange(parseFloat(e.target.value))} />
+                      </div>
+                      <div className="duration-container">
+                        <div className="current-time">{formatDuration(currentTime)}</div>
+                        /
+                        <div className="total-time">{formatDuration(duration)}</div>
+                      </div>
+                      <button id="random-button" className={isRandom ? 'active-random' : ''} onClick={() => setIsRandom(v => !v)}>
+                        <i className="fa-solid fa-shuffle"></i>
+                      </button>
+                      <button id="loop-button" className={isLoop ? 'active-loop' : ''} onClick={() => setIsLoop(v => !v)}>
+                        <i className="fa-solid fa-repeat"></i>
+                      </button>
+                      <button className="full-screen-btn" onClick={() => { if (!document.fullscreenElement) containerRef.current?.requestFullscreen(); else document.exitFullscreen() }}>
+                        <i className="fa-solid fa-expand"></i>
+                      </button>
+                    </div>
+                  </div>
+
+                  {current ? (
+                    current.parts && current.parts.length > 0 ? (
+                      <video ref={videoRef} id="video-player" onClick={onTogglePlay} onPlay={onPlay} onPause={onPause} onEnded={onEnded} onTimeUpdate={onTimeUpdate} onLoadedData={onLoadedData} src={current.parts[0].url} autoPlay />
+                    ) : (
+                      <video ref={videoRef} id="video-player" onClick={onTogglePlay} onPlay={onPlay} onPause={onPause} onEnded={onEnded} onTimeUpdate={onTimeUpdate} onLoadedData={onLoadedData} src={current.url} autoPlay />
+                    )
+                  ) : (
+                    <div style={{ padding: 16 }}>Carregando...</div>
+                  )}
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </nav>
-
-      <div className="container-main mt-5">
-        <div>
-          <div className="video-title-container">
-            <div className="video-urls-container">
-              <h5 className="video-url" onClick={() => { if (currentId) window.open(current?.url || current?.parts?.[0]?.url || '#', '_blank') }}>{currentId}</h5>
-              <h5> - </h5>
-              <h5 className="artist-url" onClick={() => { if (current?.autor) window.open(`https://www.google.com/search?q=${encodeURIComponent(current.autor)} rule34`, '_blank') }}>{current?.autor || ''}</h5>
-              <h5> - </h5>
-              <h5 className="video-title">{current?.categoria || ''}</h5>
-            </div>
-          </div>
-
-          <div ref={containerRef} className={`video-container ${showControls ? '' : 'paused'} ${isScrubbing ? 'scrubbing' : ''}`} data-volume-level={muted ? 'muted' : volume >= 0.5 ? 'high' : 'low'} style={{ cursor: showControls ? 'default' : 'none' }}>
-            <div ref={controlsRef} className="video-controls-container" style={{ opacity: showControls ? 1 : 0 }}>
-              <div className="timeline-container">
-                <div
-                  className="timeline"
-                  style={{ ['--progress-position' as any]: (duration ? currentTime / duration : 0) }}
-                  onMouseDown={onTimelineMouseDown}
-                  onClick={(e) => seekToClientX(e.clientX)}
-                >
-                  <div className="thumb-indicator"></div>
-                </div>
-              </div>
-              <div className="controls">
-                <button id="prev-button" onClick={onPrev}><i className="fa-solid fa-backward"></i></button>
-                <button className="play-pause-btn" onClick={onTogglePlay}>
-                  <i className="play-icon fa-solid fa-play" style={{ display: isPlaying ? 'none' : 'inline-block' }}></i>
-                  <i className="pause-icon fa-solid fa-pause" style={{ display: isPlaying ? 'inline-block' : 'none' }}></i>
-                </button>
-                <button id="next-button" onClick={onNext}><i className="fa-solid fa-forward"></i></button>
-                <div className="volume-container">
-                  <button className="mute-btn" onClick={onToggleMute}>
-                    <i className="volume-high-icon fa-solid fa-volume-high"></i>
-                    <i className="volume-low-icon fa-solid fa-volume-low"></i>
-                    <i className="volume-muted-icon fa-solid fa-volume-off"></i>
-                  </button>
-                  <input className="volume-slider" type="range" min="0" max="1" step="any" value={volume} onChange={(e) => onVolumeChange(parseFloat(e.target.value))} />
-                </div>
-                <div className="duration-container">
-                  <div className="current-time">{formatDuration(currentTime)}</div>
-                  /
-                  <div className="total-time">{formatDuration(duration)}</div>
-                </div>
-                <button id="random-button" className={isRandom ? 'active-random' : ''} onClick={() => setIsRandom(v => !v)}>
-                  <i className="fa-solid fa-shuffle"></i>
-                </button>
-                <button id="loop-button" className={isLoop ? 'active-loop' : ''} onClick={() => setIsLoop(v => !v)}>
-                  <i className="fa-solid fa-repeat"></i>
-                </button>
-                <button className="full-screen-btn" onClick={() => { if (!document.fullscreenElement) containerRef.current?.requestFullscreen(); else document.exitFullscreen() }}>
-                  <i className="fa-solid fa-expand"></i>
-                </button>
-              </div>
-            </div>
-
-            {current ? (
-              current.parts && current.parts.length > 0 ? (
-                <video ref={videoRef} id="video-player" onClick={onTogglePlay} onPlay={onPlay} onPause={onPause} onEnded={onEnded} onTimeUpdate={onTimeUpdate} onLoadedData={onLoadedData} src={current.parts[0].url} autoPlay />
-              ) : (
-                <video ref={videoRef} id="video-player" onClick={onTogglePlay} onPlay={onPlay} onPause={onPause} onEnded={onEnded} onTimeUpdate={onTimeUpdate} onLoadedData={onLoadedData} src={current.url} autoPlay />
-              )
-            ) : (
-              <div style={{ padding: 16 }}>Carregando...</div>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
+        } />
+      </Routes>
+    </Router>
   )
 }
 

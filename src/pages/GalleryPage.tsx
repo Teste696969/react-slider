@@ -364,7 +364,7 @@ export function GalleryPage({ videos }: GalleryPageProps) {
             alignItems: 'start',
             zIndex: 1000,
             padding: window.innerWidth <= 768 ? '0' : '24px',
-            paddingTop: window.innerWidth <= 768 ? '8px' : '24px'
+            paddingTop: window.innerWidth <= 768 ? '24px' : '24px'
           }}
           onClick={closeDialog}
         >
@@ -402,6 +402,10 @@ export function GalleryPage({ videos }: GalleryPageProps) {
             <div style={{ padding: 'clamp(48px, 8vw, 40px) clamp(1px, 2vw, 8px) clamp(24px, 5vw, 40px)', overflow: 'auto', flex: 1, display: 'flex', justifyContent: 'center' }}>
               <VideoPlayer
                 videos={videos}
+                hiddenLoop
+                hiddenRandom
+                hiddenNext
+                hiddenPrevious                
                 initialVideoId={selectedVideoId}
                 autoLoop={true}
                 containerStyle={{ width: '100%', maxWidth: '1200px' }}

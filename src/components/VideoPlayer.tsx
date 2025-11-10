@@ -12,6 +12,10 @@ type VideoPlayerProps = {
   initialVideoId?: string
   autoRandom?: boolean
   autoLoop?: boolean
+  hiddenPrevious?: boolean
+  hiddenNext?: boolean
+  hiddenRandom?: boolean
+  hiddenLoop?: boolean
   containerStyle?: React.CSSProperties
   videoStyle?: React.CSSProperties
 }
@@ -21,12 +25,20 @@ export function VideoPlayer({
   initialVideoId,
   autoRandom = true,
   autoLoop = true,
+  hiddenPrevious = false,
+  hiddenNext = false,
+  hiddenRandom = false,
+  hiddenLoop = false,
   containerStyle,
   videoStyle,
 }: VideoPlayerProps) {
   const [currentIndex, setCurrentIndex] = useState<number>(0)
   const [isRandom, setIsRandom] = useState<boolean>(autoRandom)
   const [isLoop, setIsLoop] = useState<boolean>(autoLoop)
+  const isHiddenLoop = hiddenLoop
+  const isHiddenRandom = hiddenRandom
+  const isHiddenNext = hiddenNext
+  const isHiddenPrevious = hiddenPrevious
   const [, setQueue] = useState<number[]>([])
   const randomHistory = useRef<number[]>([])
 
@@ -302,12 +314,12 @@ export function VideoPlayer({
             </div>
           </div>
           <div className="controls">
-            <button id="prev-button" onClick={onPrev}><i className="fa-solid fa-backward"></i></button>
+            <button style={{ display: isHiddenPrevious ? 'none' : 'inline-block' }}  id="prev-button" onClick={onPrev}><i className="fa-solid fa-backward"></i></button>
             <button className="play-pause-btn" onClick={onTogglePlay}>
               <i className="play-icon fa-solid fa-play" style={{ display: isPlaying ? 'none' : 'inline-block' }}></i>
               <i className="pause-icon fa-solid fa-pause" style={{ display: isPlaying ? 'inline-block' : 'none' }}></i>
             </button>
-            <button id="next-button" onClick={onNext}><i className="fa-solid fa-forward"></i></button>
+            <button style={{ display: isHiddenNext ? 'none' : 'inline-block' }} id="next-button" onClick={onNext}><i className="fa-solid fa-forward"></i></button>
             <div className="volume-container">
               <button className="mute-btn" onClick={onToggleMute}>
                 <i className="volume-high-icon fa-solid fa-volume-high"></i>
@@ -321,10 +333,10 @@ export function VideoPlayer({
               /
               <div className="total-time">{formatDuration(duration)}</div>
             </div>
-            <button id="random-button" className={isRandom ? 'active-random' : ''} onClick={() => setIsRandom(v => !v)}>
+            <button style={{ display: isHiddenRandom ? 'none' : 'inline-block' }} id="random-button" className={isRandom ? 'active-random' : ''} onClick={() => setIsRandom(v => !v)}>
               <i className="fa-solid fa-shuffle"></i>
             </button>
-            <button id="loop-button" className={isLoop ? 'active-loop' : ''} onClick={() => setIsLoop(v => !v)}>
+            <button style={{ display: isHiddenLoop ? 'none' : 'inline-block' }} id="loop-button" className={isLoop ? 'active-loop' : ''} onClick={() => setIsLoop(v => !v)}>
               <i className="fa-solid fa-repeat"></i>
             </button>
             <button className="full-screen-btn" onClick={() => { if (!document.fullscreenElement) containerRef.current?.requestFullscreen(); else document.exitFullscreen() }}>

@@ -11,7 +11,6 @@ export function GalleryPage({ videos }: GalleryPageProps) {
   const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [hoveredId, setHoveredId] = useState<string | null>(null)
-  // Filter UI state (same structure as PlayerPage)
   const [selectedArtists, setSelectedArtists] = useState<string[]>([])
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
   const [artistInput, setArtistInput] = useState<string>('')
@@ -19,9 +18,8 @@ export function GalleryPage({ videos }: GalleryPageProps) {
   const [showArtistDropdown, setShowArtistDropdown] = useState<boolean>(false)
   const [showCategoryDropdown, setShowCategoryDropdown] = useState<boolean>(false)
 
-  const itemsPerPage = 40
+  const itemsPerPage = 20
   const maxVisiblePages = 6
-
   
 
   // derive available artists/categories and suggestions
@@ -59,6 +57,15 @@ export function GalleryPage({ videos }: GalleryPageProps) {
 
   const removeCategory = useCallback((category: string) => {
     setSelectedCategories(prev => prev.filter(c => c !== category))
+  }, [])
+
+  // hover handlers to drive the hover animation (sets hoveredId)
+  const handleCardEnter = useCallback((id: string) => {
+    setHoveredId(id)
+  }, [])
+
+  const handleCardLeave = useCallback(() => {
+    setHoveredId(null)
   }, [])
 
   const addArtist = useCallback((artist: string) => {
@@ -206,6 +213,10 @@ export function GalleryPage({ videos }: GalleryPageProps) {
                 minHeight: '240px',
                 cursor: 'pointer',
               }}
+              onMouseEnter={() => handleCardEnter(video.id)}
+              onMouseLeave={() => handleCardLeave()}
+              onFocus={() => handleCardEnter(video.id)}
+              onBlur={() => handleCardLeave()}
               onClick={() => openDialog(video.id)}
             >
               <img

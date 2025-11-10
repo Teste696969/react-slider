@@ -89,9 +89,9 @@ export function PlayerPage({ videos }: PlayerPageProps) {
 
   return (
     <div>
-      <section style={{ padding: '10px 24px', display: 'flex', gap: '20px', flexWrap: 'wrap', background: '#111' }}>
+      <section style={{ padding: 'clamp(12px, 4vw, 24px) clamp(16px, 6vw, 32px)', display: 'flex', gap: 'clamp(12px, 3vw, 20px)', flexWrap: 'wrap', background: '#111', justifyContent: 'center' }}>
         <div className="filter-group" style={{ flex: 1, minWidth: '240px', position: 'relative' }}>
-          <div className="filter-input-container" style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: '5px' }}>
+          <div className="filter-input-container" style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: '8px' }}>
             <input
               type="text"
               className="form-control"
@@ -104,15 +104,15 @@ export function PlayerPage({ videos }: PlayerPageProps) {
               onFocus={() => setShowArtistDropdown(true)}
               onBlur={() => setTimeout(() => setShowArtistDropdown(false), 200)}
             />
-            <div className="selected-filters" style={{ marginBottom: 8 }}>
+            <div className="selected-filters" style={{ marginBottom: 8, display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
               {selectedArtists.map(artist => (
                 <span key={artist} className="filter-pill" style={{
                   background: '#ff8533',
                   color: 'white',
                   padding: '4px 8px',
                   borderRadius: 15,
-                  margin: '0 4px 4px 0',
-                  display: 'inline-block',
+                  display: 'inline-flex',
+                  alignItems: 'center',
                   cursor: 'pointer'
                 }}>
                   {artist} <span onClick={() => removeArtist(artist)} style={{ marginLeft: 4 }}>×</span>
@@ -147,7 +147,7 @@ export function PlayerPage({ videos }: PlayerPageProps) {
             )}
           </div>
         </div>
-        <div style={{ flex: 1, minWidth: '240px', position: 'relative', display: 'flex', flexDirection: 'column', gap: '5px' }}>
+        <div style={{ flex: 1, minWidth: '240px', position: 'relative', display: 'flex', flexDirection: 'column', gap: '8px' }}>
           <div className="filter-input-container" style={{ position: 'relative' }}>
             <input
               type="text"
@@ -188,15 +188,15 @@ export function PlayerPage({ videos }: PlayerPageProps) {
               </div>
             )}
           </div>
-          <div className="selected-filters" style={{ marginBottom: 8 }}>
+          <div className="selected-filters" style={{ marginBottom: 8, display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
             {selectedCategories.map(category => (
               <span key={category} className="filter-pill" style={{
                 background: '#ff8533',
                 color: 'white',
                 padding: '4px 8px',
                 borderRadius: 15,
-                margin: '0 4px 4px 0',
-                display: 'inline-block',
+                display: 'inline-flex',
+                alignItems: 'center',
                 cursor: 'pointer'
               }}>
                 {category} <span onClick={() => removeCategory(category)} style={{ marginLeft: 4 }}>×</span>
@@ -207,7 +207,7 @@ export function PlayerPage({ videos }: PlayerPageProps) {
       </section>
 
       <div className="container-main mt-5">
-        <VideoPlayer containerStyle={{ width: '1300px' }} videos={filtered} initialVideoId={initialVideoId} autoRandom />
+        <VideoPlayer containerStyle={{ width: '100%', maxWidth: '1200px' }} videos={filtered} initialVideoId={initialVideoId} autoRandom />
       </div>
     </div>
   )

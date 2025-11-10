@@ -83,17 +83,19 @@ export function GalleryPage({ videos }: GalleryPageProps) {
   }, [])
 
   return (
-    <div style={{ padding: '40px', minHeight: '100vh', backgroundColor: '#121212', color: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '24px' }}>
+    <div style={{ padding: 'clamp(16px, 5vw, 40px)', minHeight: '100vh', backgroundColor: '#121212', color: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'clamp(16px, 4vw, 32px)', width: '100%' }}>
       {videos.length === 0 ? (
         <div style={{ color: '#aaa', fontSize: '18px' }}>Nenhum vídeo disponível.</div>
       ) : (
         <div
           className="gallery-container"
           style={{
-            width: '95%',
+            width: '100%',
+            maxWidth: '1200px',
             display: 'grid',
-            gridTemplateColumns: 'repeat(5, minmax(0, 1fr))',
-            gap: '16px',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))',
+            gap: 'clamp(12px, 4vw, 20px)',
+            margin: '0 auto',
           }}
         >
           {paginatedVideos.map((video, index) => (
@@ -111,7 +113,7 @@ export function GalleryPage({ videos }: GalleryPageProps) {
                 transition: 'transform 0.2s ease, box-shadow 0.2s ease',
                 display: 'flex',
                 flexDirection: 'column',
-                minHeight: '260px',
+                minHeight: '240px',
                 cursor: 'pointer',
               }}
               onMouseEnter={(event) => handleCardEnter(video.id, event)}
@@ -137,8 +139,10 @@ export function GalleryPage({ videos }: GalleryPageProps) {
                     margin: 0,
                     color: '#ffbb66',
                     textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
                     overflow: 'hidden',
+                    display: '-webkit-box',
+                    WebkitLineClamp: '2',
+                    WebkitBoxOrient: 'vertical',
                   }}
                 >
                   {video.title || video.autor}
@@ -149,8 +153,10 @@ export function GalleryPage({ videos }: GalleryPageProps) {
                     color: '#ccc',
                     margin: 0,
                     textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
                     overflow: 'hidden',
+                    display: '-webkit-box',
+                    WebkitLineClamp: '1',
+                    WebkitBoxOrient: 'vertical',
                   }}
                 >
                   {video.autor}
@@ -170,6 +176,9 @@ export function GalleryPage({ videos }: GalleryPageProps) {
             alignItems: 'center',
             gap: '12px',
             flexWrap: 'wrap',
+            width: '100%',
+            maxWidth: '800px',
+            margin: '0 auto',
           }}
         >
           <button
@@ -265,7 +274,7 @@ export function GalleryPage({ videos }: GalleryPageProps) {
           <div
             style={{
               position: 'relative',
-              width: 'max(1300px)',
+              width: 'min(96vw, 1300px)',
               maxHeight: '90vh',
               background: '#0f0f0f',
               borderRadius: '16px',
@@ -293,13 +302,13 @@ export function GalleryPage({ videos }: GalleryPageProps) {
             >
               ×
             </button>
-            <div style={{ padding: '80px 24px 32px 24px', overflow: 'auto', flex: 1, display: 'flex', justifyContent: 'center' }}>
+            <div style={{ padding: 'clamp(48px, 8vw, 80px) clamp(16px, 4vw, 32px) clamp(24px, 5vw, 40px)', overflow: 'auto', flex: 1, display: 'flex', justifyContent: 'center' }}>
               <VideoPlayer
                 videos={videos}
                 initialVideoId={selectedVideoId}
                 autoRandom={false}
-                containerStyle={{ maxWidth: '100%', height: '100%', justifyContent: 'flex-start' }}
-                videoStyle={{ maxHeight: 'calc(80vh - 180px)' }}
+                containerStyle={{ maxWidth: '100%', height: '100%', justifyContent: 'flex-start', padding: 0 }}
+                videoStyle={{ maxHeight: 'min(75vh, 560px)' }}
               />
             </div>
           </div>

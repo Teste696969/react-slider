@@ -261,6 +261,10 @@ export function VideoPlayer({
         flexDirection: 'column',
         gap: '16px',
         height: '100%',
+        width: '100%',
+        maxWidth: '1300px',
+        margin: '0 auto',
+        padding: '0 clamp(12px, 4vw, 24px)',
         ...containerStyle,
       }}
     >
@@ -337,7 +341,7 @@ export function VideoPlayer({
               width: '100%',
               height: 'auto',
               flex: 1,
-              maxHeight: 'calc(75vh - 140px)',
+              maxHeight: 'min(70vh, 640px)',
               borderRadius: '12px',
               background: '#000',
               objectFit: 'contain',

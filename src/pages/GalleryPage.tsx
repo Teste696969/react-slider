@@ -189,9 +189,11 @@ export function GalleryPage({ videos }: GalleryPageProps) {
             width: '100%',
             maxWidth: '1200px',
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(270px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
             gap: 'clamp(12px, 4vw, 20px)',
             margin: '0 auto',
+            justifyItems: 'center',
+            justifyContent: 'center',
           }}
         >
           {paginatedVideos.map((video, index) => (
@@ -203,7 +205,7 @@ export function GalleryPage({ videos }: GalleryPageProps) {
                 borderRadius: '12px',
                 width: '100%',
                 overflow: 'hidden',
-                maxWidth: "270px",
+                maxWidth: "280px",
                 background: '#1e1e1e',
                 boxShadow: hoveredId === video.id ? '0 12px 20px rgba(0, 0, 0, 0.45)' : '0 8px 16px rgba(0, 0, 0, 0.35)',
                 transform: hoveredId === video.id ? 'translateY(-6px)' : 'translateY(0)',

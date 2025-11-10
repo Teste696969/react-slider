@@ -10,5 +10,6 @@ export type VideoItem = {
   id: string
   title: string
   previous_id: string
+  thumbnail_url: string
 }
 

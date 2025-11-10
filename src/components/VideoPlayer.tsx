@@ -11,6 +11,7 @@ type VideoPlayerProps = {
   videos: VideoItem[]
   initialVideoId?: string
   autoRandom?: boolean
+  autoLoop?: boolean
   containerStyle?: React.CSSProperties
   videoStyle?: React.CSSProperties
 }
@@ -19,12 +20,13 @@ export function VideoPlayer({
   videos,
   initialVideoId,
   autoRandom = true,
+  autoLoop = true,
   containerStyle,
   videoStyle,
 }: VideoPlayerProps) {
   const [currentIndex, setCurrentIndex] = useState<number>(0)
   const [isRandom, setIsRandom] = useState<boolean>(autoRandom)
-  const [isLoop, setIsLoop] = useState<boolean>(false)
+  const [isLoop, setIsLoop] = useState<boolean>(autoLoop)
   const [, setQueue] = useState<number[]>([])
   const randomHistory = useRef<number[]>([])
 
@@ -51,6 +53,7 @@ export function VideoPlayer({
   const videoRef = useRef<HTMLVideoElement | null>(null)
   const containerRef = useRef<HTMLDivElement | null>(null)
   const controlsRef = useRef<HTMLDivElement | null>(null)
+  const [isFullscreen, setIsFullscreen] = useState<boolean>(false)
 
   useEffect(() => {
     if (!videoRef.current) return
@@ -200,11 +203,16 @@ export function VideoPlayer({
     container.addEventListener('mouseenter', handleMouseEnter)
     container.addEventListener('mouseleave', handleMouseLeave)
     window.addEventListener('keydown', onKeyDown)
+    const onFull = () => {
+      setIsFullscreen(document.fullscreenElement === containerRef.current)
+    }
+    document.addEventListener('fullscreenchange', onFull)
     return () => {
       container.removeEventListener('mousemove', handleMouseMove)
       container.removeEventListener('mouseenter', handleMouseEnter)
       container.removeEventListener('mouseleave', handleMouseLeave)
       window.removeEventListener('keydown', onKeyDown)
+      document.removeEventListener('fullscreenchange', onFull)
     }
   }, [onKeyDown])
 
@@ -272,7 +280,7 @@ export function VideoPlayer({
 
       <div
         ref={containerRef}
-        className={`video-container ${showControls ? '' : 'paused'} ${isScrubbing ? 'scrubbing' : ''}`}
+        className={`video-container ${showControls ? '' : 'paused'} ${isScrubbing ? 'scrubbing' : ''} ${isFullscreen ? 'full-screen' : ''}`}
         data-volume-level={muted ? 'muted' : volume >= 0.5 ? 'high' : 'low'}
         style={{
           cursor: showControls ? 'default' : 'none',
@@ -339,9 +347,9 @@ export function VideoPlayer({
             autoPlay
             style={{
               width: '100%',
-              height: 'auto',
+              height: isFullscreen ? '100%' : 'auto',
               flex: 1,
-              maxHeight: 'min(70vh, 640px)',
+              maxHeight: isFullscreen ? undefined : 'min(70vh, 640px)',
               borderRadius: '12px',
               background: '#000',
               objectFit: 'contain',

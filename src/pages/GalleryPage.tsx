@@ -62,26 +62,6 @@ export function GalleryPage({ videos }: GalleryPageProps) {
     setSelectedVideoId(null)
   }
 
-  const handleCardEnter = useCallback((videoId: string, event: React.MouseEvent<HTMLDivElement>) => {
-    setHoveredId(videoId)
-    const videoEl = event.currentTarget.querySelector('video')
-    if (videoEl) {
-      videoEl.currentTime = 0
-      const playPromise = (videoEl as HTMLVideoElement).play()
-      if (playPromise) playPromise.catch(() => {})
-    }
-  }, [])
-
-  const handleCardLeave = useCallback((videoId: string, event: React.MouseEvent<HTMLDivElement>) => {
-    setHoveredId(prev => (prev === videoId ? null : prev))
-    const videoEl = event.currentTarget.querySelector('video')
-    if (videoEl) {
-      const element = videoEl as HTMLVideoElement
-      element.pause()
-      element.currentTime = 0
-    }
-  }, [])
-
   return (
     <div style={{ padding: 'clamp(16px, 5vw, 40px)', minHeight: '100vh', backgroundColor: '#121212', color: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'clamp(16px, 4vw, 32px)', width: '100%' }}>
       {videos.length === 0 ? (
@@ -93,7 +73,7 @@ export function GalleryPage({ videos }: GalleryPageProps) {
             width: '100%',
             maxWidth: '1200px',
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(270px, 1fr))',
             gap: 'clamp(12px, 4vw, 20px)',
             margin: '0 auto',
           }}
@@ -116,17 +96,10 @@ export function GalleryPage({ videos }: GalleryPageProps) {
                 minHeight: '240px',
                 cursor: 'pointer',
               }}
-              onMouseEnter={(event) => handleCardEnter(video.id, event)}
-              onMouseLeave={(event) => handleCardLeave(video.id, event)}
               onClick={() => openDialog(video.id)}
             >
-              <video
-                src={video.url || video.parts?.[0]?.url}
-                controls={false}
-                muted
-                loop
-                playsInline
-                preload="metadata"
+              <img
+                src={video.thumbnail_url}
                 style={{ width: '100%', aspectRatio: '16 / 9', objectFit: 'cover', background: '#000', pointerEvents: 'none', borderBottom: '1px solid #333' }}
               />
               <div
@@ -265,9 +238,10 @@ export function GalleryPage({ videos }: GalleryPageProps) {
             background: 'rgba(0, 0, 0, 0.75)',
             display: 'flex',
             justifyContent: 'center',
-            alignItems: 'center',
+            alignItems: 'start',
             zIndex: 1000,
-            padding: '24px',
+            padding: window.innerWidth <= 768 ? '0' : '24px',
+            paddingTop: window.innerWidth <= 768 ? '8px' : '24px'
           }}
           onClick={closeDialog}
         >
@@ -290,7 +264,7 @@ export function GalleryPage({ videos }: GalleryPageProps) {
               onClick={closeDialog}
               style={{
                 position: 'absolute',
-                top: '12px',
+                top: '6px',
                 right: '12px',
                 background: 'transparent',
                 border: 'none',
@@ -302,13 +276,12 @@ export function GalleryPage({ videos }: GalleryPageProps) {
             >
               ×
             </button>
-            <div style={{ padding: 'clamp(48px, 8vw, 80px) clamp(16px, 4vw, 32px) clamp(24px, 5vw, 40px)', overflow: 'auto', flex: 1, display: 'flex', justifyContent: 'center' }}>
+            <div style={{ padding: 'clamp(48px, 8vw, 40px) clamp(1px, 2vw, 8px) clamp(24px, 5vw, 40px)', overflow: 'auto', flex: 1, display: 'flex', justifyContent: 'center' }}>
               <VideoPlayer
                 videos={videos}
                 initialVideoId={selectedVideoId}
-                autoRandom={false}
-                containerStyle={{ maxWidth: '100%', height: '100%', justifyContent: 'flex-start', padding: 0 }}
-                videoStyle={{ maxHeight: 'min(75vh, 560px)' }}
+                autoLoop={true}
+                containerStyle={{ width: '100%', maxWidth: '1200px' }}
               />
             </div>
           </div>

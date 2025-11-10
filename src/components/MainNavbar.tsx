@@ -67,6 +67,8 @@ export function MainNavbar({ videos }: MainNavbarProps) {
     <nav
       style={{
         display: 'flex',
+        flexDirection: window.innerWidth <= 768 ? 'column' : 'row',
+        gap: window.innerWidth <= 768 ? '12px' : '0',
         alignItems: 'center',
         justifyContent: 'space-between',
         padding: '12px 24px',

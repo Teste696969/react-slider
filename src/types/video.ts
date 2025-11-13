@@ -4,7 +4,7 @@ export type VideoPart = {
 
 export type VideoItem = {
   url?: string
-  categoria: string
+  categoria: string | string[]
   autor: string
   parts?: VideoPart[]
   id: string

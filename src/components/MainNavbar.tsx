@@ -18,10 +18,13 @@ export function MainNavbar({ videos }: MainNavbarProps) {
     const filtered = normalized.length === 0
       ? videos
       : videos.filter(video => {
+          const categoriaStr = Array.isArray(video.categoria) 
+            ? video.categoria.join(' ') 
+            : video.categoria
           const haystack = [
             video.title,
             video.autor,
-            video.categoria,
+            categoriaStr,
             video.id,
           ]
             .filter(Boolean)
@@ -33,7 +36,8 @@ export function MainNavbar({ videos }: MainNavbarProps) {
   }, [query, videos])
 
   const selectVideo = (video: VideoItem) => {
-    navigate(`/?videoId=${encodeURIComponent(video.id)}`)
+    const videoId = String(video.id)
+    navigate(`/?videoId=${encodeURIComponent(videoId)}`)
     setQuery('')
     setIsOpen(false)
     setHighlightIndex(-1)
@@ -174,7 +178,9 @@ export function MainNavbar({ videos }: MainNavbarProps) {
                 onMouseEnter={() => setHighlightIndex(index)}
               >
                 <span style={{ fontWeight: 600, fontSize: '14px' }}>{video.title || video.id}</span>
-                <span style={{ fontSize: '12px', color: '#bbb' }}>{video.autor} · {video.categoria}</span>
+                <span style={{ fontSize: '12px', color: '#bbb' }}>
+                  {video.autor} · {Array.isArray(video.categoria) ? video.categoria.join(', ') : video.categoria}
+                </span>
               </button>
             ))}
           </div>

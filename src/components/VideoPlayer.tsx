@@ -50,7 +50,7 @@ export function VideoPlayer({
 
   useEffect(() => {
     if (!initialVideoId) return
-    const targetIndex = videos.findIndex(video => video.id === initialVideoId)
+    const targetIndex = videos.findIndex(video => String(video.id) === initialVideoId)
     if (targetIndex >= 0) {
       setCurrentIndex(targetIndex)
       randomHistory.current = [targetIndex]
@@ -357,11 +357,12 @@ export function VideoPlayer({
             onLoadedData={onLoadedData}
             src={currentSource}
             autoPlay
+            playsInline
             style={{
               width: '100%',
               height: isFullscreen ? '100%' : 'auto',
               flex: 1,
-              maxHeight: isFullscreen ? undefined : 'min(70vh, 640px)',
+              maxHeight: isFullscreen ? "none" : 'min(70vh, 640px)',
               borderRadius: '12px',
               background: '#000',
               objectFit: 'contain',

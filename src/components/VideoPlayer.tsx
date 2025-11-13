@@ -24,7 +24,7 @@ export function VideoPlayer({
   videos,
   initialVideoId,
   autoRandom = true,
-  autoLoop = true,
+  autoLoop = false,
   hiddenPrevious = false,
   hiddenNext = false,
   hiddenRandom = false,

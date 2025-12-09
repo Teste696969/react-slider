@@ -362,7 +362,7 @@ export function VideoPlayer({
               width: '100%',
               height: isFullscreen ? '100%' : 'auto',
               flex: 1,
-              maxHeight: isFullscreen ? "none" : 'min(70vh, 640px)',
+              minHeight: "100%",
               borderRadius: '12px',
               background: '#000',
               objectFit: 'contain',

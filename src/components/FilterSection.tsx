@@ -47,8 +47,10 @@ export function FilterSection({
         padding: 'clamp(12px, 4vw, 24px) clamp(16px, 6vw, 32px)',
         display: 'flex',
         gap: 'clamp(12px, 3vw, 20px)',
+        alignItems: "center",
+        width: '100%',
+        maxWidth: '1200px',
         flexWrap: 'wrap',
-        background: '#111',
         justifyContent: 'center',
         flexDirection: layout === 'column' ? 'column' : 'row',
       }}

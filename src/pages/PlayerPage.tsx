@@ -55,7 +55,7 @@ export function PlayerPage({ videos }: PlayerPageProps) {
   }, [filtered, searchParams, videos, addArtistFromVideo, addCategoriesFromVideo])
 
   return (
-    <div>
+    <div style={{ backgroundColor: '#121212', minHeight: '100vh', display: "flex", flexDirection: "column", alignItems: "center", padding: 'clamp(16px, 5vw, 40px)', color: '#fff' }}>
       <FilterSection
         artistInput={artistInput}
         categoryInput={categoryInput}
@@ -77,7 +77,7 @@ export function PlayerPage({ videos }: PlayerPageProps) {
         onRemoveCategory={removeCategory}
       />
 
-      <div className="container-main mt-5">
+      <div style={{ display: 'flex', justifyContent: 'center', margin: 'clamp(16px, 5vw, 40px) auto 0' }}>
         <VideoPlayer containerStyle={{ width: '100%', maxWidth: '1200px' }} videos={filtered} initialVideoId={initialVideoId} autoRandom />
       </div>
     </div>

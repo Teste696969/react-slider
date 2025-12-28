@@ -59,7 +59,7 @@ export function PlayerPage({ videos }: PlayerPageProps) {
   }, [filtered, searchParams, videos, addArtistFromVideo, addCategoriesFromVideo])
 
   return (
-    <div style={{ backgroundColor: '#121212', minHeight: '100vh', display: "flex", flexDirection: "column", color: '#fff' }}>
+    <div style={{ backgroundColor: '#121212', minHeight: '100vh', display: "flex", flexDirection: "column", color: '#fff', padding: "20px" }}>
       <div style={{ padding: '20px', width: '100%', alignItems: "center", display: "flex", flexDirection: "column" }}>
         <FilterSection
         artistInput={artistInput}
@@ -82,14 +82,14 @@ export function PlayerPage({ videos }: PlayerPageProps) {
         onRemoveCategory={removeCategory}
       />
       {music.length > 0 && (
-        <div style={{ width: '100%', padding: '16px 24px',  }}>
+        <div style={{ width: '100%', padding: '16px 24px', display: "flex", justifyContent: "center" }}>
           <MusicPlayer 
             music={music} 
             autoPlay={true}
             autoLoop={false}
             autoRandom={true}
             currentVideo={currentVideo}
-            containerStyle={{ maxWidth: '1200px', margin: '0 auto' }}
+            containerStyle={{ maxWidth: '1200px',  minWidth: "350px", margin: '0 auto' }}
           />
         </div>
       )}

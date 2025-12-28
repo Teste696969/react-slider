@@ -44,7 +44,7 @@ export function FilterSection({
   return (
     <section
       style={{
-        padding: 'clamp(12px, 4vw, 24px) clamp(16px, 6vw, 32px)',
+        padding: '24px',
         display: 'flex',
         gap: 'clamp(12px, 3vw, 20px)',
         width: '100%',

@@ -6,7 +6,7 @@ export function useFetchVideos() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    fetch('/videos/Videos.json')
+    fetch('https://raw.githubusercontent.com/Teste696969/videos-bunker-1/refs/heads/main/data.json')
       .then(response => response.json())
       .then(setVideos)
       .catch(e => setError(String(e)))

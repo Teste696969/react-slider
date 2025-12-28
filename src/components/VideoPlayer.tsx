@@ -280,11 +280,12 @@ export function VideoPlayer({
         display: 'flex',
         flexDirection: 'column',
         gap: '16px',
-        height: '100%',
+        minHeight: window.innerWidth <= 768 ? '350px' : '700px',
+        maxHeight: window.innerWidth <= 768 ? 'none' : '700px',
         width: '100%',
         maxWidth: '1300px',
         margin: '0 auto',
-        padding: '0 clamp(12px, 4vw, 24px)',
+        padding: window.innerWidth <= 768 ? '0' : '0 clamp(12px, 4vw, 24px)',
         ...containerStyle,
       }}
     >

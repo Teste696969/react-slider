@@ -119,10 +119,9 @@ export function GalleryPage({ videos }: GalleryPageProps) {
           className="gallery-container"
           style={{
             width: '100%',
-            maxWidth: '1200px',
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-            gap: 'clamp(12px, 4vw, 20px)',
+            gridTemplateColumns: window.innerWidth <= 768 ? 'repeat(2, 1fr)' : 'repeat(auto-fit, minmax(300px, 1fr))',
+            gap: "1px",
             margin: '0 auto',
             justifyItems: 'center',
             justifyContent: 'center',
@@ -133,13 +132,10 @@ export function GalleryPage({ videos }: GalleryPageProps) {
               key={`${video.id || video.url}-${index}`}
               className="video-card"
               style={{
-                border: '1px solid #333',
-                borderRadius: '12px',
                 width: '100%',
                 overflow: 'hidden',
-                maxWidth: "280px",
-                background: '#1e1e1e',
-                boxShadow: hoveredId === video.id ? '0 12px 20px rgba(0, 0, 0, 0.45)' : '0 8px 16px rgba(0, 0, 0, 0.35)',
+                maxWidth: "300px",
+                backgroundColor: "transparent",
                 transform: hoveredId === video.id ? 'translateY(-6px)' : 'translateY(0)',
                 transition: 'transform 0.2s ease, box-shadow 0.2s ease',
                 display: 'flex',
@@ -155,7 +151,7 @@ export function GalleryPage({ videos }: GalleryPageProps) {
             >
               <img
                 src={video.thumbnail_url}
-                style={{ width: '100%', aspectRatio: '16 / 9', objectFit: 'cover', background: '#000', pointerEvents: 'none', borderBottom: '1px solid #333' }}
+                style={{ width: '100%', height: window.innerWidth <= 768 ? '120px' : '100%', aspectRatio: '16 / 9', borderRadius: "12px", objectFit: 'cover', background: '#000', pointerEvents: 'none' }}
               />
               <div
                 className="video-info"
@@ -295,21 +291,23 @@ export function GalleryPage({ videos }: GalleryPageProps) {
             background: 'rgba(0, 0, 0, 0.75)',
             display: 'flex',
             justifyContent: 'center',
-            alignItems: 'start',
+            alignItems: window.innerWidth <= 768 ? 'stretch' : 'start',
             zIndex: 1000,
             padding: window.innerWidth <= 768 ? '0' : '24px',
-            paddingTop: window.innerWidth <= 768 ? '24px' : '24px'
+            paddingTop: window.innerWidth <= 768 ? '0' : '24px',
+            width: '100%',
+            overflowY: 'auto',
           }}
           onClick={closeDialog}
         >
           <div
             style={{
               position: 'relative',
-              width: 'min(96vw, 1300px)',
-              maxHeight: '90vh',
+              width: window.innerWidth <= 768 ? '100%' : 'min(96vw, 1300px)',
+              maxHeight: window.innerWidth <= 768 ? '100vh' : '90vh',
               background: '#0f0f0f',
-              borderRadius: '16px',
-              border: '1px solid #333',
+              borderRadius: window.innerWidth <= 768 ? '0' : '16px',
+              border: window.innerWidth <= 768 ? 'none' : '1px solid #333',
               overflow: 'hidden',
               boxShadow: '0 20px 50px rgba(0, 0, 0, 0.6)',
               display: 'flex',

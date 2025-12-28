@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { VideoPlayer } from '../components/VideoPlayer'
+import { MusicPlayer } from '../components/MusicPlayer'
 import { FilterSection } from '../components/FilterSection'
 import { useVideoFilters } from '../hooks/useVideoFilters'
+import { useFetchMusic } from '../hooks/useFetchMusic'
 import type { VideoItem } from '../types/video'
 
 type PlayerPageProps = {
@@ -11,7 +13,9 @@ type PlayerPageProps = {
 
 export function PlayerPage({ videos }: PlayerPageProps) {
   const [initialVideoId, setInitialVideoId] = useState<string | undefined>(undefined)
+  const [currentVideo, setCurrentVideo] = useState<VideoItem | null>(null)
   const [searchParams] = useSearchParams()
+  const { music } = useFetchMusic()
 
   const {
     selectedArtists,
@@ -55,8 +59,9 @@ export function PlayerPage({ videos }: PlayerPageProps) {
   }, [filtered, searchParams, videos, addArtistFromVideo, addCategoriesFromVideo])
 
   return (
-    <div style={{ backgroundColor: '#121212', minHeight: '100vh', display: "flex", flexDirection: "column", alignItems: "center", padding: 'clamp(16px, 5vw, 40px)', color: '#fff' }}>
-      <FilterSection
+    <div style={{ backgroundColor: '#121212', minHeight: '100vh', display: "flex", flexDirection: "column", color: '#fff' }}>
+      <div style={{ padding: '20px', width: '100%', alignItems: "center", display: "flex", flexDirection: "column" }}>
+        <FilterSection
         artistInput={artistInput}
         categoryInput={categoryInput}
         selectedArtists={selectedArtists}
@@ -76,9 +81,29 @@ export function PlayerPage({ videos }: PlayerPageProps) {
         onRemoveArtist={removeArtist}
         onRemoveCategory={removeCategory}
       />
+      {music.length > 0 && (
+        <div style={{ width: '100%', padding: '16px 24px',  }}>
+          <MusicPlayer 
+            music={music} 
+            autoPlay={true}
+            autoLoop={false}
+            autoRandom={true}
+            currentVideo={currentVideo}
+            containerStyle={{ maxWidth: '1200px', margin: '0 auto' }}
+          />
+        </div>
+      )}
+      
 
       <div style={{ width: "100%" }}>
-        <VideoPlayer containerStyle={{ width: '100%', maxWidth: '1200px' }} videos={filtered} initialVideoId={initialVideoId} autoRandom />
+          <VideoPlayer 
+            containerStyle={{ width: '100%', maxWidth: '1200px' }} 
+            videos={filtered} 
+            initialVideoId={initialVideoId} 
+            autoRandom
+            onVideoChange={setCurrentVideo}
+          />
+        </div>
       </div>
     </div>
   )

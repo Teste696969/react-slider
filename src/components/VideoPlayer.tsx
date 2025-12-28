@@ -18,6 +18,7 @@ type VideoPlayerProps = {
   hiddenLoop?: boolean
   containerStyle?: React.CSSProperties
   videoStyle?: React.CSSProperties
+  onVideoChange?: (video: VideoItem) => void
 }
 
 export function VideoPlayer({
@@ -31,6 +32,7 @@ export function VideoPlayer({
   hiddenLoop = false,
   containerStyle,
   videoStyle,
+  onVideoChange,
 }: VideoPlayerProps) {
   const [currentIndex, setCurrentIndex] = useState<number>(0)
   const [isRandom, setIsRandom] = useState<boolean>(autoRandom)
@@ -73,6 +75,12 @@ export function VideoPlayer({
   }, [isLoop])
 
   const current = useMemo(() => videos[currentIndex], [videos, currentIndex])
+
+  useEffect(() => {
+    if (current && onVideoChange) {
+      onVideoChange(current)
+    }
+  }, [current, onVideoChange])
 
   const [duration, setDuration] = useState<number>(0)
   const [currentTime, setCurrentTime] = useState<number>(0)

@@ -77,7 +77,7 @@ export function PlayerPage({ videos }: PlayerPageProps) {
         onRemoveCategory={removeCategory}
       />
 
-      <div style={{ display: 'flex', justifyContent: 'center', margin: 'clamp(16px, 5vw, 40px) auto 0' }}>
+      <div style={{ width: "100%" }}>
         <VideoPlayer containerStyle={{ width: '100%', maxWidth: '1200px' }} videos={filtered} initialVideoId={initialVideoId} autoRandom />
       </div>
     </div>

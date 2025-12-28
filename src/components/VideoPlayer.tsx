@@ -23,7 +23,7 @@ type VideoPlayerProps = {
 export function VideoPlayer({
   videos,
   initialVideoId,
-  autoRandom = true,
+  autoRandom = false,
   autoLoop = false,
   hiddenPrevious = false,
   hiddenNext = false,
@@ -196,21 +196,27 @@ export function VideoPlayer({
   useEffect(() => {
     const container = containerRef.current
     if (!container) return
-    const handleMouseMove = () => {
-      setShowControls(true)
+    
+    const scheduleHideControls = () => {
       if (hideTimeout.current) window.clearTimeout(hideTimeout.current)
       hideTimeout.current = window.setTimeout(() => {
-        if (isPointerInside.current && !videoRef.current?.paused) setShowControls(false)
+        if (!videoRef.current?.paused) setShowControls(false)
       }, 3000)
+    }
+    
+    const handleMouseMove = () => {
+      setShowControls(true)
+      scheduleHideControls()
     }
     const handleMouseEnter = () => {
       isPointerInside.current = true
-      handleMouseMove()
+      setShowControls(true)
+      scheduleHideControls()
     }
     const handleMouseLeave = () => {
       isPointerInside.current = false
-      if (!videoRef.current?.paused) setShowControls(false)
     }
+    
     container.addEventListener('mousemove', handleMouseMove)
     container.addEventListener('mouseenter', handleMouseEnter)
     container.addEventListener('mouseleave', handleMouseLeave)
@@ -225,8 +231,22 @@ export function VideoPlayer({
       container.removeEventListener('mouseleave', handleMouseLeave)
       window.removeEventListener('keydown', onKeyDown)
       document.removeEventListener('fullscreenchange', onFull)
+      if (hideTimeout.current) window.clearTimeout(hideTimeout.current)
     }
   }, [onKeyDown])
+
+  useEffect(() => {
+    if (!isPlaying) return
+    
+    if (hideTimeout.current) window.clearTimeout(hideTimeout.current)
+    hideTimeout.current = window.setTimeout(() => {
+      setShowControls(false)
+    }, 3000)
+    
+    return () => {
+      if (hideTimeout.current) window.clearTimeout(hideTimeout.current)
+    }
+  }, [isPlaying])
 
   const seekToClientX = useCallback((clientX: number) => {
     const container = controlsRef.current
@@ -349,7 +369,14 @@ export function VideoPlayer({
           <video
             ref={videoRef}
             id="video-player"
-            onClick={onTogglePlay}
+            onClick={() => {
+              setShowControls(true)
+              if (hideTimeout.current) window.clearTimeout(hideTimeout.current)
+              hideTimeout.current = window.setTimeout(() => {
+                if (!videoRef.current?.paused) setShowControls(false)
+              }, 3000)
+              onTogglePlay()
+            }}
             onPlay={onPlay}
             onPause={onPause}
             onEnded={onEnded}
@@ -361,8 +388,8 @@ export function VideoPlayer({
             style={{
               width: '100%',
               height: isFullscreen ? '100%' : 'auto',
-              flex: 1,
               minHeight: "100%",
+              flex: 1,
               borderRadius: '12px',
               background: 'transparent',
               objectFit: 'contain',

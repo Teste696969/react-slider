@@ -48,7 +48,7 @@ export function FilterSection({
         display: 'flex',
         gap: 'clamp(12px, 3vw, 20px)',
         width: '100%',
-        maxWidth: '1200px',
+        maxWidth: '85vw',
         flexWrap: 'wrap',
         flexDirection: layout === 'column' ? 'column' : 'row',
       }}

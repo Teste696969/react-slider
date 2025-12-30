@@ -89,7 +89,7 @@ export function PlayerPage({ videos }: PlayerPageProps) {
             autoLoop={false}
             autoRandom={true}
             currentVideo={currentVideo}
-            containerStyle={{ maxWidth: '1200px',  minWidth: "350px", margin: '0 auto' }}
+            containerStyle={{ maxWidth: '85vw',  minWidth: "350px", margin: '0 auto' }}
           />
         </div>
       )}
@@ -97,7 +97,7 @@ export function PlayerPage({ videos }: PlayerPageProps) {
 
       <div style={{ width: "100%" }}>
           <VideoPlayer 
-            containerStyle={{ width: '100%', maxWidth: '1200px' }} 
+            containerStyle={{ width: '100%', maxWidth: '85vw' }} 
             videos={filtered} 
             initialVideoId={initialVideoId} 
             autoRandom

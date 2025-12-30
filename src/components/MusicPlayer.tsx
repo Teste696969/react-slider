@@ -34,7 +34,7 @@ export function MusicPlayer({
     const [muted, setMuted] = useState<boolean>(false)
     const [duration, setDuration] = useState<number>(0)
     const [currentTime, setCurrentTime] = useState<number>(0)
-    const [volume, setVolume] = useState<number>(35)
+    const [volume, setVolume] = useState<number>(25)
     const [wasPlayingBeforePMV, setWasPlayingBeforePMV] = useState<boolean>(false)
     const audioRef = useRef<HTMLAudioElement | null>(null)
     const randomHistory = useRef<number[]>([])
@@ -78,6 +78,11 @@ export function MusicPlayer({
     }, [isLoop, isRandom])
 
     const current = useMemo(() => music[currentIndex], [music, currentIndex])
+
+    useEffect(() => {
+        if (!audioRef.current) return
+        audioRef.current.volume = volume / 100
+    }, [])
 
     useEffect(() => {
         const audio = audioRef.current

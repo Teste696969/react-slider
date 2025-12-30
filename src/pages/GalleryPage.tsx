@@ -118,7 +118,7 @@ export function GalleryPage({ videos }: GalleryPageProps) {
         <div
           className="gallery-container"
           style={{
-            width: '100%',
+            width: '85vw',
             display: 'grid',
             gridTemplateColumns: window.innerWidth <= 768 ? 'repeat(2, 1fr)' : 'repeat(auto-fit, minmax(300px, 1fr))',
             gap: "1px",
@@ -303,7 +303,7 @@ export function GalleryPage({ videos }: GalleryPageProps) {
           <div
             style={{
               position: 'relative',
-              width: window.innerWidth <= 768 ? '100%' : 'min(96vw, 1300px)',
+              width: window.innerWidth <= 768 ? '100%' : '85vw',
               maxHeight: window.innerWidth <= 768 ? '100vh' : '90vh',
               background: '#0f0f0f',
               borderRadius: window.innerWidth <= 768 ? '0' : '16px',
@@ -340,7 +340,7 @@ export function GalleryPage({ videos }: GalleryPageProps) {
                 hiddenPrevious                
                 initialVideoId={selectedVideoId}
                 autoLoop={true}
-                containerStyle={{ width: '100%', maxWidth: '1200px' }}
+                containerStyle={{ width: '100%', maxWidth: '85vw' }}
               />
             </div>
           </div>

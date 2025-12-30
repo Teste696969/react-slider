@@ -57,7 +57,7 @@ body {
 .video-container {
   position: relative;
   width: 100%;
-  max-width: 1300px;
+  max-width: 85vw;
   min-height: clamp(240px, 56vw, 720px);
   display: flex;
   justify-content: center;

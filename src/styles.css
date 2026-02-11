@@ -106,18 +106,40 @@ body {
 
 .video-container.theater,
 .video-container.full-screen {
-  max-width: initial;
-  width: 100%;
+  width: 100vw !important;
+  height: 100vh !important;
+  background-color: black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .video-container.full-screen {
-  max-height: 100vh;
+  width: 100vw !important;
+  height: 100vh !important;
+  max-height: 100vh !important;
+  background-color: black !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: 0 !important; /* Remove bordas arredondadas em tela cheia */
 }
-
 video {
   max-width: 100%;
   width: 100%;
+  object-fit: contain;
   outline: none;
+  border-radius: 0 !important; /* Remove bordas arredondadas em tela cheia */
+}
+
+.video-container.full-screen video {
+  max-width: 100% !important;
+  max-height: 100% !important;
+  width: auto !important; /* Importante para vídeos verticais */
+  height: auto !important;
+  object-fit: contain !important; /* Mantém a proporção e adiciona barras pretas */
 }
 
 .video-controls-container {
@@ -429,6 +451,13 @@ video {
     min-height: clamp(220px, 58vw, 520px);
   }
 
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  .video-container.full-screen video {
+    height: 100vh !important;
+    width: auto !important;
+  }
 }
 
 @media (max-width: 600px) {

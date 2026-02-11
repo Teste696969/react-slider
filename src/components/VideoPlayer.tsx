@@ -174,6 +174,28 @@ export function VideoPlayer({
     }
   }, [currentIndex, videos.length, isRandom, loadIndex, onNext])
 
+  const toggleFullscreen = useCallback(async () => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    try {
+      if (!document.fullscreenElement) {
+        await container.requestFullscreen();
+        // Trava em landscape (horizontal) no Android/Chrome
+        if (window.screen.orientation && "lock" in window.screen.orientation) {
+          await (window.screen.orientation as any).lock('landscape-primary').catch(() => {});
+        }
+      } else {
+        if (window.screen.orientation && "unlock" in window.screen.orientation) {
+          window.screen.orientation.unlock();
+        }
+        await document.exitFullscreen();
+      }
+    } catch (err) {
+      console.error("Erro ao alternar fullscreen:", err);
+    }
+  }, []);
+
   const onKeyDown = useCallback((e: KeyboardEvent) => {
     const active = document.activeElement?.tagName.toLowerCase()
     if (active === 'input' || active === 'button') return
@@ -183,9 +205,9 @@ export function VideoPlayer({
         e.preventDefault()
         onTogglePlay()
         break
-      case 'f':
-        if (!document.fullscreenElement) containerRef.current?.requestFullscreen()
-        else document.exitFullscreen()
+     case 'f':
+        e.preventDefault();
+        toggleFullscreen(); // Usa a nova função que trava a tela
         break
       case 'm':
         onToggleMute()
@@ -385,7 +407,7 @@ export function VideoPlayer({
             <button style={{ display: isHiddenLoop ? 'none' : 'inline-block' }} id="loop-button" className={isLoop ? 'active-loop' : ''} onClick={() => setIsLoop(v => !v)}>
               <i className="fa-solid fa-repeat"></i>
             </button>
-            <button className="full-screen-btn" onClick={() => { if (!document.fullscreenElement) containerRef.current?.requestFullscreen(); else document.exitFullscreen() }}>
+            <button className="full-screen-btn" onClick={toggleFullscreen}>
               <i className="fa-solid fa-expand"></i>
             </button>
           </div>

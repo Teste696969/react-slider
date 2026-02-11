@@ -1,21 +1,14 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { VideoPlayer } from '../components/VideoPlayer'
 import { FilterSection } from '../components/FilterSection'
 import { useVideoFilters } from '../hooks/useVideoFilters'
 import type { VideoItem } from '../types/video'
 
-type GalleryPageProps = {
-  videos: VideoItem[]
-}
+export function GalleryPage({ videos }: { videos: VideoItem[] }) {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
 
-export function GalleryPage({ videos }: GalleryPageProps) {
-  const [currentPage, setCurrentPage] = useState(1)
-  const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null)
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [hoveredId, setHoveredId] = useState<string | null>(null)
-
-  const itemsPerPage = 20
-  const maxVisiblePages = 6
+  const itemsPerPage = 20;
+  const maxVisiblePages = 6;
 
   const {
     selectedArtists,
@@ -32,60 +25,50 @@ export function GalleryPage({ videos }: GalleryPageProps) {
     removeCategory,
     addArtist,
     addCategory,
-  } = useVideoFilters(videos)
+  } = useVideoFilters(videos);
 
-  const totalPages = useMemo(() => Math.ceil(filtered.length / itemsPerPage), [filtered.length, itemsPerPage])
-  const pageCount = Math.max(1, totalPages)
+  const totalPages = useMemo(() => Math.ceil(filtered.length / itemsPerPage), [filtered.length, itemsPerPage]);
+  const pageCount = Math.max(1, totalPages);
 
   const paginatedVideos = useMemo(() => {
-    return filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
-  }, [currentPage, itemsPerPage, filtered])
+    return filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  }, [currentPage, itemsPerPage, filtered]);
 
   useEffect(() => {
-    setCurrentPage(prev => Math.min(prev, pageCount))
-  }, [pageCount])
+    setCurrentPage(prev => Math.min(prev, pageCount));
+  }, [pageCount]);
 
   const pageNumbers = useMemo(() => {
     if (pageCount <= maxVisiblePages) {
-      return Array.from({ length: pageCount }, (_, index) => index + 1)
+      return Array.from({ length: pageCount }, (_, index) => index + 1);
     }
-    const half = Math.floor(maxVisiblePages / 2)
-    let start = Math.max(1, currentPage - half)
-    let end = start + maxVisiblePages - 1
+    const half = Math.floor(maxVisiblePages / 2);
+    let start = Math.max(1, currentPage - half);
+    let end = start + maxVisiblePages - 1;
 
     if (end > pageCount) {
-      end = pageCount
-      start = end - maxVisiblePages + 1
+      end = pageCount;
+      start = end - maxVisiblePages + 1;
     }
 
-    if (start < 1) start = 1
+    if (start < 1) start = 1;
 
-    return Array.from({ length: end - start + 1 }, (_, index) => start + index)
-  }, [currentPage, pageCount, maxVisiblePages])
+    return Array.from({ length: end - start + 1 }, (_, index) => start + index);
+  }, [currentPage, pageCount, maxVisiblePages]);
 
   const handleCardEnter = useCallback((id: string) => {
-    setHoveredId(id)
-  }, [])
+    setHoveredId(id);
+  }, []);
 
   const handleCardLeave = useCallback(() => {
-    setHoveredId(null)
-  }, [])
+    setHoveredId(null);
+  }, []);
 
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= pageCount) {
-      setCurrentPage(page)
+      setCurrentPage(page);
     }
-  }
-
-  const openDialog = (videoId: string) => {
-    setSelectedVideoId(String(videoId))
-    setIsDialogOpen(true)
-  }
-
-  const closeDialog = () => {
-    setIsDialogOpen(false)
-    setSelectedVideoId(null)
-  }
+  };
 
   return (
     <div style={{ padding: window.innerWidth <= 768 ? '12px 8px' : 'clamp(16px, 5vw, 40px)', minHeight: '100vh', backgroundColor: '#121212', color: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'clamp(16px, 4vw, 32px)', width: '100%' }}>
@@ -111,6 +94,7 @@ export function GalleryPage({ videos }: GalleryPageProps) {
         <div
           className="gallery-container"
           style={{  
+             width: '100%',  
             display: 'grid',
             gridTemplateColumns: window.innerWidth <= 768 ? 'repeat(2, 1fr)' : 'repeat(auto-fit, minmax(300px, 1fr))',
             gap: "1px",
@@ -139,7 +123,7 @@ export function GalleryPage({ videos }: GalleryPageProps) {
               onMouseLeave={() => handleCardLeave()}
               onFocus={() => handleCardEnter(video.id)}
               onBlur={() => handleCardLeave()}
-              onClick={() => openDialog(video.id)}
+              onClick={() => window.open(`/video/${video.id}`, '_blank')}
             >
               <img 
               loading="lazy"
@@ -275,71 +259,7 @@ export function GalleryPage({ videos }: GalleryPageProps) {
           </button>
         </div>
       )}
-
-      {isDialogOpen && selectedVideoId && (
-        <div
-          style={{
-            position: 'fixed',
-            inset: 0,
-            background: 'rgba(0, 0, 0, 0.75)',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: window.innerWidth <= 768 ? 'stretch' : 'start',
-            zIndex: 1000,
-            padding: window.innerWidth <= 768 ? '0' : '24px',
-            paddingTop: window.innerWidth <= 768 ? '0' : '24px',
-            width: '100%',
-            overflowY: 'auto',
-          }}
-          onClick={closeDialog}
-        >
-          <div
-            style={{
-              position: 'relative',
-              width: window.innerWidth <= 768 ? '100%' : '85vw',
-              maxHeight: window.innerWidth <= 768 ? '100vh' : '90vh',
-              background: '#0f0f0f',
-              borderRadius: window.innerWidth <= 768 ? '0' : '16px',
-              border: window.innerWidth <= 768 ? 'none' : '1px solid #333',
-              overflow: 'hidden',
-              boxShadow: '0 20px 50px rgba(0, 0, 0, 0.6)',
-              display: 'flex',
-              flexDirection: 'column',
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              onClick={closeDialog}
-              style={{
-                position: 'absolute',
-                top: '6px',
-                right: '12px',
-                background: 'transparent',
-                border: 'none',
-                color: '#fff',
-                fontSize: '24px',
-                cursor: 'pointer',
-              }}
-              aria-label="Fechar"
-            >
-              ×
-            </button>
-            <div style={{ padding: 'clamp(48px, 8vw, 40px) clamp(1px, 2vw, 8px) clamp(24px, 5vw, 40px)', overflow: 'auto', flex: 1, display: 'flex', justifyContent: 'center' }}>
-              <VideoPlayer
-                videos={videos}
-                hiddenLoop
-                hiddenRandom
-                hiddenNext
-                hiddenPrevious                
-                initialVideoId={selectedVideoId}
-                autoLoop={true}
-                containerStyle={{ width: '100%', maxWidth: '85vw' }}
-              />
-            </div>
-          </div>
-        </div>
-      )}
     </div>
-  )
+  );
 }
 

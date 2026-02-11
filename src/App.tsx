@@ -10,6 +10,10 @@ const GalleryPage = lazy(() =>
   import('./pages/GalleryPage').then(module => ({ default: module.GalleryPage }))
 );
 
+const VideoDetailPage = lazy(() => 
+  import('./pages/VideoDetailPage').then(module => ({ default: module.VideoDetailPage }))
+);
+
 export default function App() {
   const { videos, error } = useFetchVideos()
 
@@ -23,6 +27,7 @@ export default function App() {
       )}
       <Routes>
         <Route path="/gallery" element={<GalleryPage videos={videos} />} />
+        <Route path="/video/:videoId" element={<VideoDetailPage videos={videos} />} />
         <Route path="/" element={<PlayerPage videos={videos} />} />
       </Routes>
     </Router>

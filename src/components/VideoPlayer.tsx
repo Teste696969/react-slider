@@ -17,6 +17,7 @@ type VideoPlayerProps = {
   hiddenNext?: boolean
   hiddenRandom?: boolean
   hiddenLoop?: boolean
+  hiddenButtons?: boolean
   containerStyle?: React.CSSProperties
   videoStyle?: React.CSSProperties
   onVideoChange?: (video: VideoItem) => void
@@ -31,6 +32,7 @@ export function VideoPlayer({
   hiddenNext = false,
   hiddenRandom = false,
   hiddenLoop = false,
+  hiddenButtons = false,
   containerStyle,
   videoStyle,
   onVideoChange,
@@ -42,6 +44,7 @@ export function VideoPlayer({
   const isHiddenRandom = hiddenRandom
   const isHiddenNext = hiddenNext
   const isHiddenPrevious = hiddenPrevious
+  const isHiddenButtons = hiddenButtons
   const [, setQueue] = useState<number[]>([])
   const randomHistory = useRef<number[]>([])
 
@@ -496,13 +499,13 @@ export function VideoPlayer({
           
           <div
             style={{
+              display: "flex",
               width: '100%',
               height: isFullscreen ? '100%' : 'auto',
               minHeight: "100%",
               flex: 1,
               background: '#000',
               overflow: 'hidden',
-              display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               position: 'relative',
@@ -545,7 +548,7 @@ export function VideoPlayer({
                 left: 0,
                 right: 0,
                 bottom: 0,
-                display: 'grid',
+                display: isHiddenButtons ? 'none' : 'grid',
                 gridTemplateColumns: '1fr 1fr 1fr',
                 gap: 0,
                 zIndex: 5,
@@ -559,10 +562,10 @@ export function VideoPlayer({
                   handleRewindClick()
                 }}
                 style={{
+                  display: 'flex',
                   background: 'transparent',
                   border: 'none',
                   cursor: showControls ? 'pointer' : 'none',
-                  display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   position: 'relative',

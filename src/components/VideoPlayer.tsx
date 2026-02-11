@@ -295,7 +295,6 @@ export function VideoPlayer({
       console.error("Erro ao alternar fullscreen:", err);
     }
   }, [isMobile]);
-
   const onKeyDown = useCallback(
     (e: KeyboardEvent) => {
       const active = document.activeElement?.tagName.toLowerCase();

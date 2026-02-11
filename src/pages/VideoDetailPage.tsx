@@ -119,7 +119,6 @@ export function VideoDetailPage({ videos }: { videos: VideoItem[] }) {
                     cursor: "pointer",
                     boxShadow: "0 2px 8px #0004",
                   }}
-                  onClick={() => navigate(`/video/${video.id}`)}
                 >
                   <img
                     src={video.thumbnail_url}
@@ -129,32 +128,45 @@ export function VideoDetailPage({ videos }: { videos: VideoItem[] }) {
                       objectFit: "cover",
                       background: "#000",
                     }}
+                    onClick={() => navigate(`/video/${video.id}`)}
                   />
-                  <div
+                  <a
+                    href={`/video/${video.id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     style={{
-                      padding: "10px",
-                      color: "#fff",
-                      fontSize: "15px",
-                      fontWeight: 500,
-                      textOverflow: "ellipsis",
-                      overflow: "hidden",
-                      whiteSpace: "nowrap",
+                      color: "inherit",
+                      width: "100%",
+                      maxWidth: "300px",
+                      display: "block",
                     }}
                   >
-                    {video.title || video.autor}
-                  </div>
-                  <div
-                    style={{
-                      padding: "0 10px 10px 10px",
-                      color: "#aaa",
-                      fontSize: "13px",
-                      textOverflow: "ellipsis",
-                      overflow: "hidden",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    {video.autor}
-                  </div>
+                    <div
+                      style={{
+                        padding: "10px",
+                        color: "#fff",
+                        fontSize: "15px",
+                        fontWeight: 500,
+                        textOverflow: "ellipsis",
+                        overflow: "hidden",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {video.title || video.autor}
+                    </div>
+                    <div
+                      style={{
+                        padding: "0 10px 10px 10px",
+                        color: "#aaa",
+                        fontSize: "13px",
+                        textOverflow: "ellipsis",
+                        overflow: "hidden",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {video.autor}
+                    </div>
+                  </a>
                 </div>
               ))}
             </div>
@@ -222,7 +234,9 @@ export function VideoDetailPage({ videos }: { videos: VideoItem[] }) {
             )}
           </div>
 
-          <div style={{ width: "17%", margin: "auto 0 auto" }}>
+          <div
+            style={{ maxWidth: "17%", minWidth: "17%", margin: "auto 0 auto" }}
+          >
             <div
               style={{
                 display: "flex",
@@ -240,7 +254,6 @@ export function VideoDetailPage({ videos }: { videos: VideoItem[] }) {
                     cursor: "pointer",
                     boxShadow: "0 2px 8px #0004",
                   }}
-                  onClick={() => navigate(`/video/${video.id}`)}
                 >
                   <img
                     src={video.thumbnail_url}
@@ -250,32 +263,45 @@ export function VideoDetailPage({ videos }: { videos: VideoItem[] }) {
                       objectFit: "cover",
                       background: "#000",
                     }}
+                    onClick={() => navigate(`/video/${video.id}`)}
                   />
-                  <div
+                  <a
+                    href={`/video/${video.id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     style={{
-                      padding: "10px",
-                      color: "#fff",
-                      fontSize: "15px",
-                      fontWeight: 500,
-                      textOverflow: "ellipsis",
-                      overflow: "hidden",
-                      whiteSpace: "nowrap",
+                      color: "inherit",
+                      width: "100%",
+                      maxWidth: "300px",
+                      display: "block",
                     }}
                   >
-                    {video.title || video.autor}
-                  </div>
-                  <div
-                    style={{
-                      padding: "0 10px 10px 10px",
-                      color: "#aaa",
-                      fontSize: "13px",
-                      textOverflow: "ellipsis",
-                      overflow: "hidden",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    {video.autor}
-                  </div>
+                    <div
+                      style={{
+                        padding: "10px",
+                        color: "#fff",
+                        fontSize: "15px",
+                        fontWeight: 500,
+                        textOverflow: "ellipsis",
+                        overflow: "hidden",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {video.title || video.autor}
+                    </div>
+                    <div
+                      style={{
+                        padding: "0 10px 10px 10px",
+                        color: "#aaa",
+                        fontSize: "13px",
+                        textOverflow: "ellipsis",
+                        overflow: "hidden",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {video.autor}
+                    </div>
+                  </a>
                 </div>
               ))}
             </div>

@@ -145,6 +145,7 @@ export function MainNavbar({ videos }: MainNavbarProps) {
               position: "absolute",
               top: "110%",
               left: 0,
+              zIndex: 1000000000,
               right: 0,
               background: "#1f1f1f",
               border: "1px solid #2c2c2c",

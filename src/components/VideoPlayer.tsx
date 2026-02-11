@@ -211,7 +211,7 @@ export function VideoPlayer({
       rewindClickTimeoutRef.current = window.setTimeout(() => {
         rewindClickCountRef.current = 0;
       }, 300);
-    } else if (rewindClickCountRef.current === 2) {
+    } else if (rewindClickCountRef.current === 2 && !isHiddenButtons) {
       // Double click - go to previous video
       if (rewindClickTimeoutRef.current) {
         clearTimeout(rewindClickTimeoutRef.current);
@@ -242,7 +242,7 @@ export function VideoPlayer({
       forwardClickTimeoutRef.current = window.setTimeout(() => {
         forwardClickCountRef.current = 0;
       }, 300);
-    } else if (forwardClickCountRef.current === 2) {
+    } else if (forwardClickCountRef.current === 2 && !isHiddenButtons) {
       // Double click - go to next video
       if (forwardClickTimeoutRef.current) {
         clearTimeout(forwardClickTimeoutRef.current);
@@ -652,7 +652,7 @@ export function VideoPlayer({
                 left: 0,
                 right: 0,
                 bottom: 0,
-                display: isHiddenButtons ? "none" : "grid",
+                display: "grid",
                 gridTemplateColumns: "1fr 1fr 1fr",
                 gap: 0,
                 zIndex: 5,

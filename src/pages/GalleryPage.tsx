@@ -20,17 +20,14 @@ export function GalleryPage({ videos }: GalleryPageProps) {
   const {
     selectedArtists,
     selectedCategories,
-    artistInput,
-    categoryInput,
-    showArtistDropdown,
-    showCategoryDropdown,
-    artistSuggestions,
-    categorySuggestions,
+    searchInput,
+    showSuggestions,
+    randomArtists,
+    allCategories,
+    searchSuggestions,
     filtered,
-    setArtistInput,
-    setCategoryInput,
-    setShowArtistDropdown,
-    setShowCategoryDropdown,
+    setSearchInput,
+    setShowSuggestions,
     removeArtist,
     removeCategory,
     addArtist,
@@ -93,20 +90,16 @@ export function GalleryPage({ videos }: GalleryPageProps) {
   return (
     <div style={{ padding: 'clamp(16px, 5vw, 40px)', minHeight: '100vh', backgroundColor: '#121212', color: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'clamp(16px, 4vw, 32px)', width: '100%' }}>
       <FilterSection
-        artistInput={artistInput}
-        categoryInput={categoryInput}
+        searchInput={searchInput}
         selectedArtists={selectedArtists}
         selectedCategories={selectedCategories}
-        artistSuggestions={artistSuggestions}
-        categorySuggestions={categorySuggestions}
-        showArtistDropdown={showArtistDropdown}
-        showCategoryDropdown={showCategoryDropdown}
-        onArtistInputChange={setArtistInput}
-        onCategoryInputChange={setCategoryInput}
-        onArtistFocus={() => setShowArtistDropdown(true)}
-        onArtistBlur={() => setShowArtistDropdown(false)}
-        onCategoryFocus={() => setShowCategoryDropdown(true)}
-        onCategoryBlur={() => setShowCategoryDropdown(false)}
+        randomArtists={randomArtists}
+        allCategories={allCategories}
+        searchSuggestions={searchSuggestions}
+        showSuggestions={showSuggestions}
+        onSearchInputChange={setSearchInput}
+        onSearchFocus={() => setShowSuggestions(true)}
+        onSearchBlur={() => setShowSuggestions(false)}
         onAddArtist={addArtist}
         onAddCategory={addCategory}
         onRemoveArtist={removeArtist}

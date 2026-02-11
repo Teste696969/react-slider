@@ -1,13 +1,16 @@
 import { useCallback, useMemo, useState } from 'react'
 import type { VideoItem } from '../types/video'
 
+export type QuerySuggestion = {
+  type: 'artist' | 'category'
+  value: string
+}
+
 export function useVideoFilters(videos: VideoItem[]) {
   const [selectedArtists, setSelectedArtists] = useState<string[]>([])
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
-  const [artistInput, setArtistInput] = useState<string>('')
-  const [categoryInput, setCategoryInput] = useState<string>('')
-  const [showArtistDropdown, setShowArtistDropdown] = useState<boolean>(false)
-  const [showCategoryDropdown, setShowCategoryDropdown] = useState<boolean>(false)
+  const [searchInput, setSearchInput] = useState<string>('')
+  const [showSuggestions, setShowSuggestions] = useState<boolean>(false)
 
   const allArtists = useMemo(() => Array.from(new Set(videos.map(v => v.autor))).sort(), [videos])
   
@@ -23,15 +26,26 @@ export function useVideoFilters(videos: VideoItem[]) {
     return Array.from(categories).sort()
   }, [videos])
 
-  const artistSuggestions = useMemo(() => {
-    if (!artistInput) return allArtists.filter(a => !selectedArtists.includes(a))
-    return allArtists.filter(a => a.toLowerCase().includes(artistInput.toLowerCase()) && !selectedArtists.includes(a))
-  }, [allArtists, artistInput, selectedArtists])
+  const randomArtists = useMemo(() => {
+    const available = allArtists.filter(a => !selectedArtists.includes(a))
+    const shuffled = [...available].sort(() => Math.random() - 0.5)
+    return shuffled.slice(0, 10)
+  }, [allArtists, selectedArtists])
 
-  const categorySuggestions = useMemo(() => {
-    if (!categoryInput) return allCategories.filter(c => !selectedCategories.includes(c))
-    return allCategories.filter(c => c.toLowerCase().includes(categoryInput.toLowerCase()) && !selectedCategories.includes(c))
-  }, [allCategories, categoryInput, selectedCategories])
+  const searchSuggestions = useMemo(() => {
+    if (!searchInput.trim()) return []
+
+    const searchLower = searchInput.toLowerCase()
+    const matchedArtists: QuerySuggestion[] = allArtists
+      .filter(a => a.toLowerCase().includes(searchLower) && !selectedArtists.includes(a))
+      .map(a => ({ type: 'artist' as const, value: a }))
+
+    const matchedCategories: QuerySuggestion[] = allCategories
+      .filter(c => c.toLowerCase().includes(searchLower) && !selectedCategories.includes(c))
+      .map(c => ({ type: 'category' as const, value: c }))
+
+    return [...matchedArtists, ...matchedCategories]
+  }, [allArtists, allCategories, searchInput, selectedArtists, selectedCategories])
 
   const filtered = useMemo(() => {
     return videos.filter(v => {
@@ -53,16 +67,12 @@ export function useVideoFilters(videos: VideoItem[]) {
   const addArtist = useCallback((artist: string) => {
     if (!selectedArtists.includes(artist)) {
       setSelectedArtists(prev => [...prev, artist])
-      setArtistInput('')
-      setShowArtistDropdown(false)
     }
   }, [selectedArtists])
 
   const addCategory = useCallback((category: string) => {
     if (!selectedCategories.includes(category)) {
       setSelectedCategories(prev => [...prev, category])
-      setCategoryInput('')
-      setShowCategoryDropdown(false)
     }
   }, [selectedCategories])
 
@@ -86,29 +96,24 @@ export function useVideoFilters(videos: VideoItem[]) {
   const clearFilters = useCallback(() => {
     setSelectedArtists([])
     setSelectedCategories([])
-    setArtistInput('')
-    setCategoryInput('')
+    setSearchInput('')
   }, [])
 
   return {
     // State
     selectedArtists,
     selectedCategories,
-    artistInput,
-    categoryInput,
-    showArtistDropdown,
-    showCategoryDropdown,
+    searchInput,
+    showSuggestions,
     // Computed
     allArtists,
     allCategories,
-    artistSuggestions,
-    categorySuggestions,
+    randomArtists,
+    searchSuggestions,
     filtered,
     // Actions
-    setArtistInput,
-    setCategoryInput,
-    setShowArtistDropdown,
-    setShowCategoryDropdown,
+    setSearchInput,
+    setShowSuggestions,
     removeArtist,
     removeCategory,
     addArtist,

@@ -20,17 +20,14 @@ export function PlayerPage({ videos }: PlayerPageProps) {
   const {
     selectedArtists,
     selectedCategories,
-    artistInput,
-    categoryInput,
-    showArtistDropdown,
-    showCategoryDropdown,
-    artistSuggestions,
-    categorySuggestions,
+    searchInput,
+    showSuggestions,
+    randomArtists,
+    allCategories,
+    searchSuggestions,
     filtered,
-    setArtistInput,
-    setCategoryInput,
-    setShowArtistDropdown,
-    setShowCategoryDropdown,
+    setSearchInput,
+    setShowSuggestions,
     removeArtist,
     removeCategory,
     addArtist,
@@ -62,25 +59,21 @@ export function PlayerPage({ videos }: PlayerPageProps) {
     <div style={{ backgroundColor: '#121212', minHeight: '100vh', display: "flex", flexDirection: "column", color: '#fff', padding: "20px" }}>
       <div style={{ padding: '20px', width: '100%', alignItems: "center", display: "flex", flexDirection: "column" }}>
         <FilterSection
-        artistInput={artistInput}
-        categoryInput={categoryInput}
-        selectedArtists={selectedArtists}
-        selectedCategories={selectedCategories}
-        artistSuggestions={artistSuggestions}
-        categorySuggestions={categorySuggestions}
-        showArtistDropdown={showArtistDropdown}
-        showCategoryDropdown={showCategoryDropdown}
-        onArtistInputChange={setArtistInput}
-        onCategoryInputChange={setCategoryInput}
-        onArtistFocus={() => setShowArtistDropdown(true)}
-        onArtistBlur={() => setShowArtistDropdown(false)}
-        onCategoryFocus={() => setShowCategoryDropdown(true)}
-        onCategoryBlur={() => setShowCategoryDropdown(false)}
-        onAddArtist={addArtist}
-        onAddCategory={addCategory}
-        onRemoveArtist={removeArtist}
-        onRemoveCategory={removeCategory}
-      />
+          searchInput={searchInput}
+          selectedArtists={selectedArtists}
+          selectedCategories={selectedCategories}
+          randomArtists={randomArtists}
+          allCategories={allCategories}
+          searchSuggestions={searchSuggestions}
+          showSuggestions={showSuggestions}
+          onSearchInputChange={setSearchInput}
+          onSearchFocus={() => setShowSuggestions(true)}
+          onSearchBlur={() => setShowSuggestions(false)}
+          onAddArtist={addArtist}
+          onAddCategory={addCategory}
+          onRemoveArtist={removeArtist}
+          onRemoveCategory={removeCategory}
+        />
       {music.length > 0 && (
         <div style={{ width: '100%', padding: '16px 24px', display: "flex", justifyContent: "center" }}>
           <MusicPlayer 

@@ -1,211 +1,305 @@
+import type { QuerySuggestion } from '../hooks/useVideoFilters'
+
 type FilterSectionProps = {
-  artistInput: string
-  categoryInput: string
+  searchInput: string
   selectedArtists: string[]
   selectedCategories: string[]
-  artistSuggestions: string[]
-  categorySuggestions: string[]
-  showArtistDropdown: boolean
-  showCategoryDropdown: boolean
-  onArtistInputChange: (value: string) => void
-  onCategoryInputChange: (value: string) => void
-  onArtistFocus: () => void
-  onArtistBlur: () => void
-  onCategoryFocus: () => void
-  onCategoryBlur: () => void
+  randomArtists: string[]
+  allCategories: string[]
+  searchSuggestions: QuerySuggestion[]
+  showSuggestions: boolean
+  onSearchInputChange: (value: string) => void
+  onSearchFocus: () => void
+  onSearchBlur: () => void
   onAddArtist: (artist: string) => void
   onAddCategory: (category: string) => void
   onRemoveArtist: (artist: string) => void
   onRemoveCategory: (category: string) => void
-  layout?: 'row' | 'column'
 }
 
 export function FilterSection({
-  artistInput,
-  categoryInput,
+  searchInput,
   selectedArtists,
   selectedCategories,
-  artistSuggestions,
-  categorySuggestions,
-  showArtistDropdown,
-  showCategoryDropdown,
-  onArtistInputChange,
-  onCategoryInputChange,
-  onArtistFocus,
-  onArtistBlur,
-  onCategoryFocus,
-  onCategoryBlur,
+  randomArtists = [],
+  allCategories = [],
+  searchSuggestions = [],
+  showSuggestions,
+  onSearchInputChange,
+  onSearchFocus,
+  onSearchBlur,
   onAddArtist,
   onAddCategory,
   onRemoveArtist,
   onRemoveCategory,
-  layout = 'row',
 }: FilterSectionProps) {
   return (
     <section
       style={{
         padding: '24px',
         display: 'flex',
-        gap: 'clamp(12px, 3vw, 20px)',
+        flexDirection: 'column',
+        gap: '24px',
         width: '100%',
         maxWidth: '85vw',
-        flexWrap: 'wrap',
-        flexDirection: layout === 'column' ? 'column' : 'row',
       }}
     >
-      {/* Artist Filter */}
-      <div className="filter-group" style={{ flex: 1, minWidth: '240px', position: 'relative' }}>
-        <div
-          className="filter-input-container"
-          style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: '8px' }}
-        >
-          <input
-            type="text"
-            className="form-control"
-            placeholder="Buscar artistas..."
-            value={artistInput}
-            onChange={e => {
-              onArtistInputChange(e.target.value)
-              onArtistFocus()
-            }}
-            onFocus={onArtistFocus}
-            onBlur={() => setTimeout(onArtistBlur, 200)}
-          />
+      {/* Search Input */}
+      <div style={{ position: 'relative', width: '100%', maxWidth: '500px' }}>
+        <input
+          type="text"
+          className="form-control"
+          placeholder="Procurar artistas ou categorias..."
+          value={searchInput}
+          onChange={e => onSearchInputChange(e.target.value)}
+          onFocus={onSearchFocus}
+          onBlur={() => setTimeout(onSearchBlur, 200)}
+          style={{
+            width: '100%',
+            padding: '12px 16px',
+            fontSize: '16px',
+            borderRadius: '8px',
+          }}
+        />
+
+        {/* Search Suggestions Dropdown */}
+        {showSuggestions && searchSuggestions.length > 0 && (
           <div
-            className="selected-filters"
-            style={{ marginBottom: 8, display: 'flex', flexWrap: 'wrap', gap: '6px' }}
+            style={{
+              position: 'absolute',
+              width: '100%',
+              maxHeight: '300px',
+              overflowY: 'auto',
+              background: '#343a40',
+              border: '1px solid #454d55',
+              borderRadius: '8px',
+              zIndex: 1000,
+              top: '100%',
+              marginTop: '8px',
+            }}
           >
-            {selectedArtists.map(artist => (
-              <span
-                key={artist}
-                className="filter-pill"
+            {searchSuggestions.map((suggestion, index) => (
+              <a
+                key={`${suggestion.type}-${suggestion.value}-${index}`}
+                href="#"
+                onClick={e => {
+                  e.preventDefault()
+                  if (suggestion.type === 'artist') {
+                    onAddArtist(suggestion.value)
+                  } else {
+                    onAddCategory(suggestion.value)
+                  }
+                  onSearchInputChange('')
+                }}
                 style={{
-                  background: '#ff8533',
-                  color: 'white',
-                  padding: '4px 8px',
-                  borderRadius: 15,
-                  display: 'inline-flex',
+                  color: '#fff',
+                  display: 'flex',
                   alignItems: 'center',
-                  cursor: 'pointer',
+                  padding: '12px 16px',
+                  textDecoration: 'none',
+                  fontSize: '14px',
+                  gap: '12px',
+                  borderBottom: '1px solid #454d55',
+                }}
+                onMouseEnter={e => {
+                  const target = e.currentTarget
+                  target.style.backgroundColor = '#454d55'
+                }}
+                onMouseLeave={e => {
+                  const target = e.currentTarget
+                  target.style.backgroundColor = 'transparent'
                 }}
               >
-                {artist}{' '}
                 <span
-                  onClick={() => onRemoveArtist(artist)}
-                  style={{ marginLeft: 4, cursor: 'pointer' }}
-                >
-                  ×
+                  style={{
+                    display: 'inline-block',
+                    width: '8px',
+                    height: '8px',
+                    borderRadius: '50%',
+                    background: suggestion.type === 'artist' ? '#ff8533' : '#6c757d',
+                  }}
+                />
+                {suggestion.value}
+                <span style={{ fontSize: '12px', color: '#aaa', marginLeft: 'auto' }}>
+                  {suggestion.type === 'artist' ? 'Artista' : 'Categoria'}
                 </span>
-              </span>
+              </a>
             ))}
           </div>
-          {showArtistDropdown && artistSuggestions.length > 0 && (
-            <div
-              className="dropdown-menu show"
-              style={{
-                position: 'absolute',
-                width: '100%',
-                maxHeight: '200px',
-                overflowY: 'auto',
-                background: '#343a40',
-                border: '1px solid #454d55',
-                zIndex: 1000,
-                top: '100%',
-              }}
-            >
-              {artistSuggestions.map(artist => (
-                <a
-                  key={artist}
-                  className="dropdown-item"
-                  href="#"
-                  onClick={e => {
-                    e.preventDefault()
-                    onAddArtist(artist)
-                  }}
-                  style={{ color: '#fff', display: 'block', padding: '8px 12px' }}
-                >
-                  {artist}
-                </a>
-              ))}
-            </div>
-          )}
-        </div>
+        )}
       </div>
 
-      {/* Category Filter */}
-      <div style={{ flex: 1, minWidth: '240px', position: 'relative', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-        <div className="filter-input-container" style={{ position: 'relative' }}>
-          <input
-            type="text"
-            className="form-control"
-            placeholder="Buscar categorias..."
-            value={categoryInput}
-            onChange={e => {
-              onCategoryInputChange(e.target.value)
-              onCategoryFocus()
-            }}
-            onFocus={onCategoryFocus}
-            onBlur={() => setTimeout(onCategoryBlur, 200)}
-          />
-          {showCategoryDropdown && categorySuggestions.length > 0 && (
-            <div
-              className="dropdown-menu show"
-              style={{
-                position: 'absolute',
-                width: '100%',
-                maxHeight: '200px',
-                overflowY: 'auto',
-                background: '#343a40',
-                border: '1px solid #454d55',
-                zIndex: 1000,
-                top: '100%',
-              }}
-            >
-              {categorySuggestions.map(category => (
-                <a
-                  key={category}
-                  className="dropdown-item"
-                  href="#"
-                  onClick={e => {
-                    e.preventDefault()
-                    onAddCategory(category)
-                  }}
-                  style={{ color: '#fff', display: 'block', padding: '8px 12px' }}
-                >
-                  {category}
-                </a>
-              ))}
-            </div>
-          )}
-        </div>
+      {/* Selected Filters */}
+      {(selectedArtists.length > 0 || selectedCategories.length > 0) && (
         <div
-          className="selected-filters"
-          style={{ marginBottom: 8, display: 'flex', flexWrap: 'wrap', gap: '6px' }}
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '8px',
+            padding: '16px',
+            background: 'rgba(255, 133, 51, 0.1)',
+            borderRadius: '8px',
+          }}
         >
-          {selectedCategories.map(category => (
+          {selectedArtists.map(artist => (
             <span
-              key={category}
-              className="filter-pill"
+              key={artist}
               style={{
                 background: '#ff8533',
                 color: 'white',
-                padding: '4px 8px',
-                borderRadius: 15,
+                padding: '6px 12px',
+                borderRadius: '20px',
                 display: 'inline-flex',
                 alignItems: 'center',
-                cursor: 'pointer',
+                gap: '6px',
+                fontSize: '14px',
               }}
             >
-              {category}{' '}
+              {artist}
+              <span
+                onClick={() => onRemoveArtist(artist)}
+                style={{ cursor: 'pointer', fontWeight: 'bold', fontSize: '16px' }}
+              >
+                ×
+              </span>
+            </span>
+          ))}
+
+          {selectedCategories.map(category => (
+            <span
+              key={category}
+              style={{
+                background: '#6c757d',
+                color: 'white',
+                padding: '6px 12px',
+                borderRadius: '20px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                fontSize: '14px',
+              }}
+            >
+              {category}
               <span
                 onClick={() => onRemoveCategory(category)}
-                style={{ marginLeft: 4, cursor: 'pointer' }}
+                style={{ cursor: 'pointer', fontWeight: 'bold', fontSize: '16px' }}
               >
                 ×
               </span>
             </span>
           ))}
         </div>
+      )}
+
+      {/* Quick Select Sections */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        {/* Random Artists */}
+        {randomArtists.length > 0 && (
+          <div>
+            <h3
+              style={{
+                fontSize: '14px',
+                fontWeight: '600',
+                color: '#aaa',
+                marginBottom: '12px',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px',
+              }}
+            >
+              Artistas
+            </h3>
+            <div
+              style={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: '8px',
+              }}
+            >
+              {randomArtists.map(artist => (
+                <button
+                  key={artist}
+                  onClick={() => onAddArtist(artist)}
+                  style={{
+                    padding: '8px 16px',
+                    background: '#2a2d31',
+                    color: '#fff',
+                    border: '1px solid #454d55',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    transition: 'all 0.2s ease',
+                  }}
+                  onMouseEnter={e => {
+                    const target = e.currentTarget
+                    target.style.borderColor = '#ff8533'
+                    target.style.backgroundColor = 'rgba(255, 133, 51, 0.1)'
+                  }}
+                  onMouseLeave={e => {
+                    const target = e.currentTarget
+                    target.style.borderColor = '#454d55'
+                    target.style.backgroundColor = '#2a2d31'
+                  }}
+                >
+                  {artist}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* All Categories */}
+        {allCategories.length > 0 && (
+          <div>
+            <h3
+              style={{
+                fontSize: '14px',
+                fontWeight: '600',
+                color: '#aaa',
+                marginBottom: '12px',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px',
+              }}
+            >
+              Categorias
+            </h3>
+            <div
+              style={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: '8px',
+              }}
+            >
+              {allCategories.map(category => (
+                <button
+                  key={category}
+                  onClick={() => onAddCategory(category)}
+                  style={{
+                    padding: '8px 16px',
+                    background: '#2a2d31',
+                    color: '#fff',
+                    border: '1px solid #454d55',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    transition: 'all 0.2s ease',
+                  }}
+                  onMouseEnter={e => {
+                    const target = e.currentTarget
+                    target.style.borderColor = '#6c757d'
+                    target.style.backgroundColor = 'rgba(108, 117, 125, 0.1)'
+                  }}
+                  onMouseLeave={e => {
+                    const target = e.currentTarget
+                    target.style.borderColor = '#454d55'
+                    target.style.backgroundColor = '#2a2d31'
+                  }}
+                >
+                  {category}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </section>
   )

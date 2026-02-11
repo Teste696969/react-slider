@@ -6,6 +6,7 @@ import React, {
   useState,
 } from 'react'
 import type { VideoItem } from '../types/video'
+import { useIsMobile } from '../hooks/useMobile'
 
 type VideoPlayerProps = {
   videos: VideoItem[]
@@ -72,6 +73,7 @@ export function VideoPlayer({
   const forwardClickTimeoutRef = useRef<number | null>(null)
   const rewindClickCountRef = useRef<number>(0)
   const forwardClickCountRef = useRef<number>(0)
+  const isMobile = useIsMobile()
 
   useEffect(() => {
     if (!videoRef.current) return

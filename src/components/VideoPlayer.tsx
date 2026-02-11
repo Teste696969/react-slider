@@ -6,7 +6,6 @@ import React, {
   useState,
 } from "react";
 import type { VideoItem } from "../types/video";
-import { useIsMobile } from "../hooks/useMobile";
 
 type VideoPlayerProps = {
   videos: VideoItem[];

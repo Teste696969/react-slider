@@ -531,7 +531,7 @@ export function VideoPlayer({
                 width: '100%',
                 height: '100%',
                 background: '#000',
-                objectFit: 'cover',
+                objectFit: 'contain',
                 display: 'block',
                 ...videoStyle,
               }}

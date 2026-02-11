@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { VideoItem } from '../types/video'
 
 export type QuerySuggestion = {
@@ -11,6 +11,8 @@ export function useVideoFilters(videos: VideoItem[]) {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
   const [searchInput, setSearchInput] = useState<string>('')
   const [showSuggestions, setShowSuggestions] = useState<boolean>(false)
+  const [randomArtists, setRandomArtists] = useState<string[]>([])
+  const randomArtistsPoolRef = useRef<string[]>([])
 
   const allArtists = useMemo(() => Array.from(new Set(videos.map(v => v.autor))).sort(), [videos])
   
@@ -26,11 +28,20 @@ export function useVideoFilters(videos: VideoItem[]) {
     return Array.from(categories).sort()
   }, [videos])
 
-  const randomArtists = useMemo(() => {
-    const available = allArtists.filter(a => !selectedArtists.includes(a))
-    const shuffled = [...available].sort(() => Math.random() - 0.5)
-    return shuffled.slice(0, 15)
-  }, [allArtists, selectedArtists])
+  // Gera a lista de artistas aleatórios apenas quando allArtists muda
+  useEffect(() => {
+    const shuffled = [...allArtists].sort(() => Math.random() - 0.5)
+    randomArtistsPoolRef.current = shuffled.slice(0, 15)
+    // Filtra para remover já selecionados
+    const filtered = randomArtistsPoolRef.current.filter(a => !selectedArtists.includes(a))
+    setRandomArtists(filtered)
+  }, [allArtists]) // Só recalcula quando allArtists (vídeos) muda
+
+  // Atualiza a exibição quando selectedArtists muda (apenas remove os já selecionados, sem resorteio)
+  useEffect(() => {
+    const filtered = randomArtistsPoolRef.current.filter(a => !selectedArtists.includes(a))
+    setRandomArtists(filtered)
+  }, [selectedArtists])
 
   const searchSuggestions = useMemo(() => {
     if (!searchInput.trim()) return []

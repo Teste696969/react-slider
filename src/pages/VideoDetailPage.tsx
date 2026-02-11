@@ -2,7 +2,6 @@ import { useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { VideoPlayer } from "../components/VideoPlayer";
 import type { VideoItem } from "../types/video";
-import { useIsMobile } from "../hooks/useMobile";
 import { useFetchMusic } from "../hooks/useFetchMusic";
 import { MusicPlayer } from "../components/MusicPlayer";
 
@@ -25,8 +24,6 @@ export function VideoDetailPage({ videos }: { videos: VideoItem[] }) {
 
   const { music } = useFetchMusic();
 
-  const isMobile = useIsMobile();
-
   useEffect(() => {
     window.scrollTo({
       top: 0,
@@ -40,72 +37,69 @@ export function VideoDetailPage({ videos }: { videos: VideoItem[] }) {
     );
   }
 
-  if (isMobile) {
-    return (
-      <>
-        <div
-          style={{
-            minHeight: "100vh",
-            background: "#121212",
-            color: "#fff",
-            padding: "24px",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            width: "100%",
-          }}
-        >
+  const isMobileLayout = window.innerWidth <= 768;
+
+  return (
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "#121212",
+        color: "#fff",
+        padding: "24px",
+        display: "flex",
+        flexDirection: isMobileLayout ? "column" : "row",
+        width: "100%",
+        gap: "20px",
+      }}
+    >
+      <div
+        style={{
+          flex: isMobileLayout ? "none" : 1,
+          width: "100%",
+          display: "flex",
+          flexDirection: "column",
+          gap: "20px",
+        }}
+      >
+        <div style={{ width: "100%" }}>
+          <VideoPlayer
+            videos={[currentVideo]}
+            initialVideoId={String(currentVideo.id)}
+            autoLoop={true}
+            hiddenLoop
+            hiddenRandom
+            hiddenNext
+            hiddenPrevious
+            hiddenButtons
+            containerStyle={{ width: "100%" }}
+          />
+        </div>
+        {music.length > 0 && (
           <div
             style={{
               width: "100%",
               display: "flex",
-              flexDirection: "column",
-              gap: "20px",
+              justifyContent: "center",
             }}
           >
-            <div style={{ width: "100%" }}>
-              <VideoPlayer
-                videos={[currentVideo]}
-                initialVideoId={String(currentVideo.id)}
-                autoLoop={true}
-                hiddenLoop
-                hiddenRandom
-                hiddenNext
-                hiddenPrevious
-                hiddenButtons
-                containerStyle={{ width: "100%" }}
-              />
-            </div>
-            {music.length > 0 && (
-              <div
-                style={{
-                  width: "100%",
-                  display: "flex",
-                  padding:
-                    window.innerWidth <= 768 ? "0" : "0 clamp(12px, 4vw, 24px)",
-                  justifyContent: "center",
-                }}
-              >
-                <MusicPlayer
-                  music={music}
-                  autoPlay={true}
-                  autoLoop={false}
-                  autoRandom={true}
-                  containerStyle={{
-                    width: "100%",
-                  }}
-                />
-              </div>
-            )}
+            <MusicPlayer
+              music={music}
+              autoPlay={true}
+              autoLoop={false}
+              autoRandom={true}
+              containerStyle={{
+                width: "100%",
+              }}
+            />
           </div>
+        )}
 
+        {isMobileLayout && (
           <div style={{ width: "100%", margin: "32px auto 0 auto" }}>
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: isMobile
-                  ? "repeat(2, 1fr)"
-                  : "repeat(4, 1fr)",
+                gridTemplateColumns: "repeat(2, 1fr)",
                 gap: "16px",
               }}
             >
@@ -171,143 +165,87 @@ export function VideoDetailPage({ videos }: { videos: VideoItem[] }) {
               ))}
             </div>
           </div>
-        </div>
-      </>
-    );
-  }
+        )}
+      </div>
 
-  if (!isMobile) {
-    return (
-      <>
+      {!isMobileLayout && (
         <div
           style={{
-            minHeight: "100vh",
-            background: "#121212",
-            color: "#fff",
-            padding: "24px",
-            display: "flex",
-            flexDirection: "row",
-            width: "100%",
+            maxWidth: "17%",
+            minWidth: "17%",
+            margin: "auto 0 auto",
           }}
         >
           <div
             style={{
-              width: "100%",
               display: "flex",
               flexDirection: "column",
-              gap: "20px",
+              gap: "16px",
             }}
           >
-            <div style={{ width: "100%" }}>
-              <VideoPlayer
-                videos={[currentVideo]}
-                initialVideoId={String(currentVideo.id)}
-                autoLoop={true}
-                hiddenLoop
-                hiddenRandom
-                hiddenNext
-                hiddenPrevious
-                hiddenButtons
-                containerStyle={{ width: "100%" }}
-              />
-            </div>
-            {music.length > 0 && (
+            {recommendations.map((video) => (
               <div
+                key={video.id}
                 style={{
-                  width: "100%",
-                  display: "flex",
-                  padding:
-                    window.innerWidth <= 768 ? "0" : "0 clamp(12px, 4vw, 24px)",
-                  justifyContent: "center",
+                  background: "#222",
+                  borderRadius: "12px",
+                  overflow: "hidden",
+                  cursor: "pointer",
+                  boxShadow: "0 2px 8px #0004",
                 }}
               >
-                <MusicPlayer
-                  music={music}
-                  autoPlay={true}
-                  autoLoop={false}
-                  autoRandom={true}
-                  containerStyle={{
-                    width: "100%",
-                  }}
-                />
-              </div>
-            )}
-          </div>
-
-          <div
-            style={{ maxWidth: "17%", minWidth: "17%", margin: "auto 0 auto" }}
-          >
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "16px",
-              }}
-            >
-              {recommendations.map((video) => (
-                <div
-                  key={video.id}
+                <img
+                  src={video.thumbnail_url}
                   style={{
-                    background: "#222",
-                    borderRadius: "12px",
-                    overflow: "hidden",
-                    cursor: "pointer",
-                    boxShadow: "0 2px 8px #0004",
+                    width: "100%",
+                    height: "140px",
+                    objectFit: "cover",
+                    background: "#000",
+                  }}
+                  onClick={() => navigate(`/video/${video.id}`)}
+                />
+                <a
+                  href={`/video/${video.id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    color: "inherit",
+                    width: "100%",
+                    maxWidth: "300px",
+                    display: "block",
                   }}
                 >
-                  <img
-                    src={video.thumbnail_url}
+                  <div
                     style={{
-                      width: "100%",
-                      height: "140px",
-                      objectFit: "cover",
-                      background: "#000",
-                    }}
-                    onClick={() => navigate(`/video/${video.id}`)}
-                  />
-                  <a
-                    href={`/video/${video.id}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                      color: "inherit",
-                      width: "100%",
-                      maxWidth: "300px",
-                      display: "block",
+                      padding: "10px",
+                      color: "#fff",
+                      fontSize: "15px",
+                      fontWeight: 500,
+                      textOverflow: "ellipsis",
+                      overflow: "hidden",
+                      whiteSpace: "nowrap",
                     }}
                   >
-                    <div
-                      style={{
-                        padding: "10px",
-                        color: "#fff",
-                        fontSize: "15px",
-                        fontWeight: 500,
-                        textOverflow: "ellipsis",
-                        overflow: "hidden",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      {video.title || video.autor}
-                    </div>
-                    <div
-                      style={{
-                        padding: "0 10px 10px 10px",
-                        color: "#aaa",
-                        fontSize: "13px",
-                        textOverflow: "ellipsis",
-                        overflow: "hidden",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      {video.autor}
-                    </div>
-                  </a>
-                </div>
-              ))}
-            </div>
+                    {video.title || video.autor}
+                  </div>
+                  <div
+                    style={{
+                      padding: "0 10px 10px 10px",
+                      color: "#aaa",
+                      fontSize: "13px",
+                      textOverflow: "ellipsis",
+                      overflow: "hidden",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {video.autor}
+                  </div>
+                </a>
+              </div>
+            ))}
           </div>
         </div>
-      </>
-    );
-  }
+      )}
+    </div>
+  );
 }

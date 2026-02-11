@@ -202,46 +202,64 @@ export function VideoPlayer({
   }, [onToggleMute, onTogglePlay])
 
   useEffect(() => {
-    const container = containerRef.current
-    if (!container) return
+  const container = containerRef.current
+  if (!container) return
+
+  const hideControls = () => {
+    if (!videoRef.current?.paused) {
+      setShowControls(false)
+    }
+  }
+
+  const scheduleHide = () => {
+    // 1. Sempre mostra os controles ao interagir
+    setShowControls(true) 
     
-    const scheduleHideControls = () => {
-      if (hideTimeout.current) window.clearTimeout(hideTimeout.current)
-      hideTimeout.current = window.setTimeout(() => {
-        if (!videoRef.current?.paused) setShowControls(false)
-      }, 3000)
-    }
+    // 2. Limpa o timer anterior para o mouse não sumir enquanto move
+    if (hideTimeout.current) window.clearTimeout(hideTimeout.current)
     
-    const handleMouseMove = () => {
-      setShowControls(true)
-      scheduleHideControls()
+    // 3. Agenda o sumiço apenas se o vídeo estiver rodando
+    if (!videoRef.current?.paused) {
+      hideTimeout.current = window.setTimeout(hideControls, 3000)
     }
-    const handleMouseEnter = () => {
-      isPointerInside.current = true
-      setShowControls(true)
-      scheduleHideControls()
-    }
-    const handleMouseLeave = () => {
-      isPointerInside.current = false
-    }
-    
-    container.addEventListener('mousemove', handleMouseMove)
-    container.addEventListener('mouseenter', handleMouseEnter)
-    container.addEventListener('mouseleave', handleMouseLeave)
-    window.addEventListener('keydown', onKeyDown)
-    const onFull = () => {
-      setIsFullscreen(document.fullscreenElement === containerRef.current)
-    }
-    document.addEventListener('fullscreenchange', onFull)
-    return () => {
-      container.removeEventListener('mousemove', handleMouseMove)
-      container.removeEventListener('mouseenter', handleMouseEnter)
-      container.removeEventListener('mouseleave', handleMouseLeave)
-      window.removeEventListener('keydown', onKeyDown)
-      document.removeEventListener('fullscreenchange', onFull)
-      if (hideTimeout.current) window.clearTimeout(hideTimeout.current)
-    }
-  }, [onKeyDown])
+  }
+
+  const handleMouseMove = () => {
+    scheduleHide()
+  }
+
+  const handleMouseEnter = () => {
+    isPointerInside.current = true
+    scheduleHide()
+  }
+
+  const handleMouseLeave = () => {
+    isPointerInside.current = false
+    // Opcional: esconder mais rápido ao sair do container
+    if (hideTimeout.current) window.clearTimeout(hideTimeout.current)
+    hideControls()
+  }
+
+  // Eventos
+  container.addEventListener('mousemove', handleMouseMove)
+  container.addEventListener('mouseenter', handleMouseEnter)
+  container.addEventListener('mouseleave', handleMouseLeave)
+  window.addEventListener('keydown', onKeyDown)
+
+  const onFull = () => {
+    setIsFullscreen(document.fullscreenElement === containerRef.current)
+  }
+  document.addEventListener('fullscreenchange', onFull)
+
+  return () => {
+    container.removeEventListener('mousemove', handleMouseMove)
+    container.removeEventListener('mouseenter', handleMouseEnter)
+    container.removeEventListener('mouseleave', handleMouseLeave)
+    window.removeEventListener('keydown', onKeyDown)
+    document.removeEventListener('fullscreenchange', onFull)
+    if (hideTimeout.current) window.clearTimeout(hideTimeout.current)
+  }
+}, [onKeyDown, isPlaying])
 
   useEffect(() => {
     if (!isPlaying) return

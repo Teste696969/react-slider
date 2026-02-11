@@ -288,8 +288,6 @@ export function VideoPlayer({
   }, []);
 
   useEffect(() => {
-    if (!isFullscreen) return;
-
     const lockOrientation = async () => {
       if (window.screen.orientation && "lock" in window.screen.orientation) {
         try {
@@ -301,9 +299,7 @@ export function VideoPlayer({
     };
 
     const handleOrientationChange = () => {
-      if (isFullscreen) {
-        lockOrientation();
-      }
+      lockOrientation();
     };
 
     // Tenta travar imediatamente

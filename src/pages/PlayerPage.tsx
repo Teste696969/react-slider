@@ -106,30 +106,6 @@ export function PlayerPage({ videos }: PlayerPageProps) {
           onRemoveArtist={removeArtist}
           onRemoveCategory={removeCategory}
         />
-
-        {music.length > 0 && window.innerWidth > 768 && (
-          <div
-            style={{
-              width: "100%",
-              display: "flex",
-              paddingLeft: "8px",
-              paddingRight: "8px",
-              justifyContent: "center",
-              marginTop: "24px",
-            }}
-          >
-            <MusicPlayer
-              music={music}
-              autoPlay={true}
-              autoLoop={false}
-              autoRandom={true}
-              currentVideo={currentVideo}
-              containerStyle={{
-                width: "100%",
-              }}
-            />
-          </div>
-        )}
       </div>
 
       <div
@@ -156,13 +132,15 @@ export function PlayerPage({ videos }: PlayerPageProps) {
           />
         </div>
 
-        {music.length > 0 && isMobileLayout && (
+        {music.length > 0 && (
           <div
             style={{
               width: "100%",
-              padding: "14px 8px",
               display: "flex",
+              paddingLeft: "8px",
+              paddingRight: "8px",
               justifyContent: "center",
+              marginTop: "24px",
             }}
           >
             <MusicPlayer
@@ -173,7 +151,6 @@ export function PlayerPage({ videos }: PlayerPageProps) {
               currentVideo={currentVideo}
               containerStyle={{
                 width: "100%",
-                margin: "0 auto",
               }}
             />
           </div>

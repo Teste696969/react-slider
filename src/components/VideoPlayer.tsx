@@ -287,6 +287,48 @@ export function VideoPlayer({
     }
   }, []);
 
+  useEffect(() => {
+    if (!isFullscreen) return;
+
+    const lockOrientation = async () => {
+      if (window.screen.orientation && "lock" in window.screen.orientation) {
+        try {
+          await (window.screen.orientation as any).lock("landscape-primary");
+        } catch (err) {
+          console.log("Não foi possível travar a orientação:", err);
+        }
+      }
+    };
+
+    const handleOrientationChange = () => {
+      if (isFullscreen) {
+        lockOrientation();
+      }
+    };
+
+    // Tenta travar imediatamente
+    lockOrientation();
+
+    // Monitora mudanças de orientação
+    window.addEventListener("orientationchange", handleOrientationChange);
+    if (window.screen.orientation) {
+      window.screen.orientation.addEventListener(
+        "change",
+        handleOrientationChange,
+      );
+    }
+
+    return () => {
+      window.removeEventListener("orientationchange", handleOrientationChange);
+      if (window.screen.orientation) {
+        window.screen.orientation.removeEventListener(
+          "change",
+          handleOrientationChange,
+        );
+      }
+    };
+  }, [isFullscreen]);
+
   const onKeyDown = useCallback(
     (e: KeyboardEvent) => {
       const active = document.activeElement?.tagName.toLowerCase();
@@ -467,6 +509,13 @@ export function VideoPlayer({
           flexDirection: "column",
           flex: 1,
           minHeight: 0,
+          ...(isFullscreen && {
+            transform:
+              window.innerHeight > window.innerWidth ? "rotate(90deg)" : "none",
+            transformOrigin: "center",
+            width: window.innerHeight > window.innerWidth ? "100vh" : "100vw",
+            height: window.innerHeight > window.innerWidth ? "100vw" : "100vh",
+          }),
         }}
       >
         <div

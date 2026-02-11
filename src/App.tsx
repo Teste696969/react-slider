@@ -1,7 +1,12 @@
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Outlet,
+} from "react-router-dom";
 import { MainNavbar } from "./components/MainNavbar";
 import { useFetchVideos } from "./hooks/useFetchVideos";
-import { lazy } from "react";
+import { lazy, Suspense } from "react";
 const PlayerPage = lazy(() =>
   import("./pages/PlayerPage").then((module) => ({
     default: module.PlayerPage,
@@ -20,6 +25,23 @@ const VideoDetailPage = lazy(() =>
   })),
 );
 
+function LoadingFallback() {
+  return (
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "#121212",
+        color: "#fff",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      Carregando...
+    </div>
+  );
+}
+
 export default function App() {
   const { videos, error } = useFetchVideos();
 
@@ -37,14 +59,16 @@ export default function App() {
           Erro ao carregar vídeos: {error}
         </div>
       )}
-      <Routes>
-        <Route path="/gallery" element={<GalleryPage videos={videos} />} />
-        <Route
-          path="/video/:videoId"
-          element={<VideoDetailPage videos={videos} />}
-        />
-        <Route path="/" element={<PlayerPage videos={videos} />} />
-      </Routes>
+      <Suspense fallback={<LoadingFallback />}>
+        <Routes>
+          <Route path="/gallery" element={<GalleryPage videos={videos} />} />
+          <Route
+            path="/video/:videoId"
+            element={<VideoDetailPage videos={videos} />}
+          />
+          <Route path="/" element={<PlayerPage videos={videos} />} />
+        </Routes>
+      </Suspense>
     </Router>
   );
 }

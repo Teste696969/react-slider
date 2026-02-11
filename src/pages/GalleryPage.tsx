@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { FilterSection } from "../components/FilterSection";
 import { useVideoFilters } from "../hooks/useVideoFilters";
 import type { VideoItem } from "../types/video";
+import { useIsMobile } from "../hooks/useMobile";
 
 export function GalleryPage({ videos }: { videos: VideoItem[] }) {
   const [currentPage, setCurrentPage] = useState(1);
@@ -76,26 +77,27 @@ export function GalleryPage({ videos }: { videos: VideoItem[] }) {
     }
   };
 
+  const isMobile = useIsMobile();
+
   return (
     <div
       style={{
         backgroundColor: "#121212",
         minHeight: "100vh",
         display: "flex",
-        flexDirection: "row",
+        flexDirection: isMobile ? "column" : "row",
         gap: "24px",
         padding: "24px 12px",
         color: "#fff",
-        flexWrap: window.innerWidth <= 768 ? "wrap" : "nowrap",
+        flexWrap: "wrap",
       }}
     >
       <div
         style={{
           display: "flex",
-          flexDirection: "column",
-          width: window.innerWidth <= 768 ? "100%" : "25%",
+          flexDirection: isMobile ? "column" : "row",
+          width: isMobile ? "100%" : "25%",
           minWidth: "250px",
-          flexShrink: 0,
         }}
       >
         <FilterSection
@@ -122,8 +124,7 @@ export function GalleryPage({ videos }: { videos: VideoItem[] }) {
           display: "flex",
           flexDirection: "column",
           gap: "24px",
-          minWidth: window.innerWidth <= 768 ? "100%" : "0",
-          width: window.innerWidth <= 768 ? "100%" : "auto",
+          width: isMobile ? "100%" : "auto",
         }}
       >
         {filtered.length === 0 ? (
@@ -137,10 +138,9 @@ export function GalleryPage({ videos }: { videos: VideoItem[] }) {
               style={{
                 width: "100%",
                 display: "grid",
-                gridTemplateColumns:
-                  window.innerWidth <= 768
-                    ? "repeat(2, 1fr)"
-                    : "repeat(5, 1fr)",
+                gridTemplateColumns: isMobile
+                  ? "repeat(2, 1fr)"
+                  : "repeat(5, 1fr)",
                 gap: "1px",
                 margin: "0",
                 justifyItems: "center",
@@ -158,7 +158,9 @@ export function GalleryPage({ videos }: { videos: VideoItem[] }) {
                     color: "inherit",
                     width: "100%",
                     maxWidth: "300px",
-                    display: "block",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
                   }}
                   onMouseEnter={() => handleCardEnter(video.id)}
                   onMouseLeave={() => handleCardLeave()}

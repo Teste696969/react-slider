@@ -88,6 +88,7 @@ export function PlayerPage({ videos }: PlayerPageProps) {
             alignItems: "center",
             display: "flex",
             flexDirection: "column",
+            padding: "0 8px",
           }}
         >
           <FilterSection
@@ -121,7 +122,7 @@ export function PlayerPage({ videos }: PlayerPageProps) {
             <div
               style={{
                 width: "100%",
-                padding: "16px 24px",
+                padding: "24px 8px",
                 display: "flex",
                 justifyContent: "center",
               }}
@@ -133,8 +134,7 @@ export function PlayerPage({ videos }: PlayerPageProps) {
                 autoRandom={true}
                 currentVideo={currentVideo}
                 containerStyle={{
-                  maxWidth: "85vw",
-                  minWidth: "350px",
+                  width: "100%",
                   margin: "0 auto",
                 }}
               />
@@ -146,7 +146,7 @@ export function PlayerPage({ videos }: PlayerPageProps) {
         style={{
           width: "100%",
           display: "flex",
-          padding: "24px",
+          padding: "24px 12px",
           flexDirection: "row",
         }}
       >

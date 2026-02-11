@@ -38,11 +38,13 @@ export function FilterSection({
       style={{
         paddingTop: '24px',
         paddingBottom: '24px',
+        paddingLeft: window.innerWidth <= 768 ? '8px' : '24px',
+        paddingRight: window.innerWidth <= 768 ? '8px' : '24px',
         display: 'flex',
         flexDirection: 'column',
         gap: '24px',
         width: '100%',
-        maxWidth: '85vw',
+        maxWidth: window.innerWidth <= 768 ? '100%' : '85vw',
       }}
     >
       {/* Search Input */}

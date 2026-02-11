@@ -88,7 +88,7 @@ export function GalleryPage({ videos }: GalleryPageProps) {
   }
 
   return (
-    <div style={{ padding: 'clamp(16px, 5vw, 40px)', minHeight: '100vh', backgroundColor: '#121212', color: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'clamp(16px, 4vw, 32px)', width: '100%' }}>
+    <div style={{ padding: window.innerWidth <= 768 ? '12px 8px' : 'clamp(16px, 5vw, 40px)', minHeight: '100vh', backgroundColor: '#121212', color: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'clamp(16px, 4vw, 32px)', width: '100%' }}>
       <FilterSection
         searchInput={searchInput}
         selectedArtists={selectedArtists}
@@ -110,8 +110,7 @@ export function GalleryPage({ videos }: GalleryPageProps) {
       ) : (
         <div
           className="gallery-container"
-          style={{
-            width: '85vw',  
+          style={{  
             display: 'grid',
             gridTemplateColumns: window.innerWidth <= 768 ? 'repeat(2, 1fr)' : 'repeat(auto-fit, minmax(300px, 1fr))',
             gap: "1px",

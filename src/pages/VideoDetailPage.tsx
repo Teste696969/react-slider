@@ -10,6 +10,7 @@ import { useIsMobile } from "../hooks/useMobile";
 export function VideoDetailPage({ videos }: { videos: VideoItem[] }) {
   const { videoId } = useParams();
   const navigate = useNavigate();
+  const isMobileLayout = useIsMobile();
 
   // Find current video
   const currentVideo = useMemo(() => {
@@ -37,8 +38,6 @@ export function VideoDetailPage({ videos }: { videos: VideoItem[] }) {
       <div style={{ color: "#fff", padding: 32 }}>Vídeo não encontrado.</div>
     );
   }
-
-  const isMobileLayout = useIsMobile();
 
   return (
     <div

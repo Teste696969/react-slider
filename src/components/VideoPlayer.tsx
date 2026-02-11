@@ -491,8 +491,12 @@ export function VideoPlayer({
               height: isFullscreen ? '100%' : 'auto',
               minHeight: "100%",
               flex: 1,
-              borderRadius: '12px',
+              background: 'transparent',
+              objectFit: 'contain',
               overflow: 'hidden',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
           >
             <video

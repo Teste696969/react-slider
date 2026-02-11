@@ -81,7 +81,6 @@ export function VideoPlayer({
   const forwardClickTimeoutRef = useRef<number | null>(null);
   const rewindClickCountRef = useRef<number>(0);
   const forwardClickCountRef = useRef<number>(0);
-  const isMobile = useIsMobile();
 
   useEffect(() => {
     if (!videoRef.current) return;
@@ -276,25 +275,19 @@ export function VideoPlayer({
             .catch(() => {});
         }
       } else {
-        // Sai do fullscreen
         if (
           window.screen.orientation &&
           "unlock" in window.screen.orientation
         ) {
           window.screen.orientation.unlock();
-          // Se for mobile, força o modo vertical após sair do fullscreen
-          if (isMobile) {
-            await (window.screen.orientation as any)
-              .lock("portrait-primary")
-              .catch(() => {});
-          }
         }
         await document.exitFullscreen();
       }
     } catch (err) {
       console.error("Erro ao alternar fullscreen:", err);
     }
-  }, [isMobile]);
+  }, []);
+
   const onKeyDown = useCallback(
     (e: KeyboardEvent) => {
       const active = document.activeElement?.tagName.toLowerCase();

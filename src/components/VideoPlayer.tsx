@@ -437,13 +437,13 @@ export function VideoPlayer({
         minHeight: isFullscreen
           ? "100vh"
           : window.innerWidth <= 768
-            ? "600px"
-            : "auto",
+            ? "640px"
+            : "540px",
         maxHeight: isFullscreen
           ? "100vh"
           : window.innerWidth <= 768
-            ? "600px"
-            : "900px",
+            ? "640px"
+            : "600px",
         width: "100%",
         margin: "0 auto",
         ...containerStyle,
@@ -555,8 +555,7 @@ export function VideoPlayer({
             style={{
               display: "flex",
               width: "100%",
-              height: isFullscreen ? "100%" : "auto",
-              minHeight: "100%",
+              height: isFullscreen ? "100%" : "100%",
               flex: 1,
               background: "#000",
               overflow: "hidden",

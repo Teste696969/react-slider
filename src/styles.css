@@ -364,7 +364,7 @@ video {
 }
 
 .timeline-container {
-  height: 8px;
+  height: 10px;
   margin-inline: 0.5rem;
   cursor: pointer;
   display: flex;
@@ -377,11 +377,10 @@ video {
 
 .timeline {
   background-color: rgba(255, 255, 255, 0.2);
-  height: 4px;
+  height: 10px;
   width: 100%;
   position: relative;
   border-radius: 2px;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5);
   transition: all 150ms ease-in-out;
 }
 
@@ -437,7 +436,7 @@ video {
 
 .video-container.scrubbing .timeline,
 .timeline-container:hover .timeline {
-  height: 6px;
+  height: 10px;
   background-color: rgba(255, 255, 255, 0.3);
 }
 

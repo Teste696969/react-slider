@@ -29,7 +29,7 @@ export function useVideoFilters(videos: VideoItem[]) {
   const randomArtists = useMemo(() => {
     const available = allArtists.filter(a => !selectedArtists.includes(a))
     const shuffled = [...available].sort(() => Math.random() - 0.5)
-    return shuffled.slice(0, 10)
+    return shuffled.slice(0, 15)
   }, [allArtists, selectedArtists])
 
   const searchSuggestions = useMemo(() => {

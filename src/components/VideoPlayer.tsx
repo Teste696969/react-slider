@@ -259,15 +259,20 @@ export function VideoPlayer({
           await (window.screen.orientation as any).lock('landscape-primary').catch(() => {});
         }
       } else {
+        // Sai do fullscreen
         if (window.screen.orientation && "unlock" in window.screen.orientation) {
           window.screen.orientation.unlock();
+          // Se for mobile, força o modo vertical após sair do fullscreen
+          if (isMobile) {
+            await (window.screen.orientation as any).lock('portrait-primary').catch(() => {});
+          }
         }
         await document.exitFullscreen();
       }
     } catch (err) {
       console.error("Erro ao alternar fullscreen:", err);
     }
-  }, []);
+  }, [isMobile]);
 
   const onKeyDown = useCallback((e: KeyboardEvent) => {
     const active = document.activeElement?.tagName.toLowerCase()
@@ -495,12 +500,12 @@ export function VideoPlayer({
               height: isFullscreen ? '100%' : 'auto',
               minHeight: "100%",
               flex: 1,
-              background: 'transparent',
-              objectFit: 'contain',
+              background: '#000',
               overflow: 'hidden',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
+              position: 'relative',
             }}
           >
             <video
@@ -525,8 +530,8 @@ export function VideoPlayer({
               style={{
                 width: '100%',
                 height: '100%',
-                background: 'transparent',
-                objectFit: 'contain',
+                background: '#000',
+                objectFit: 'cover',
                 display: 'block',
                 ...videoStyle,
               }}
@@ -556,13 +561,12 @@ export function VideoPlayer({
                 style={{
                   background: 'transparent',
                   border: 'none',
-                  cursor: 'pointer',
+                  cursor: showControls ? 'pointer' : 'none',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   position: 'relative',
                 }}
-                title="Retroceder 5s (duplo clique para anterior)"
               >
                 <div
                   style={{
@@ -589,12 +593,11 @@ export function VideoPlayer({
                 style={{
                   background: 'transparent',
                   border: 'none',
-                  cursor: 'pointer',
+                  cursor: showControls ? 'pointer' : 'none',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}
-                title="Pausar/Reproduzir"
               >
                 <div
                   style={{
@@ -621,13 +624,12 @@ export function VideoPlayer({
                 style={{
                   background: 'transparent',
                   border: 'none',
-                  cursor: 'pointer',
+                  cursor: showControls ? 'pointer' : 'none',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   position: 'relative',
                 }}
-                title="Avançar 5s (duplo clique para próximo)"
               >
                 <div
                   style={{

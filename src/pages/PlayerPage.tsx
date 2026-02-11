@@ -150,7 +150,7 @@ export function PlayerPage({ videos }: PlayerPageProps) {
           flexDirection: "row",
         }}
       >
-       <div style={{ display: "flex", flexDirection: "column" }}>
+       <div style={{ display: "flex", flexDirection: "column", width: "25%" }}>
          <FilterSection
           searchInput={searchInput}
           selectedArtists={selectedArtists}

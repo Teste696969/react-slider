@@ -68,11 +68,23 @@ export function VideoPlayer({
   const containerRef = useRef<HTMLDivElement | null>(null)
   const controlsRef = useRef<HTMLDivElement | null>(null)
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false)
+  const rewindClickTimeoutRef = useRef<number | null>(null)
+  const forwardClickTimeoutRef = useRef<number | null>(null)
+  const rewindClickCountRef = useRef<number>(0)
+  const forwardClickCountRef = useRef<number>(0)
 
   useEffect(() => {
     if (!videoRef.current) return
     videoRef.current.loop = isLoop
   }, [isLoop])
+
+  // Cleanup double-click timers on unmount
+  useEffect(() => {
+    return () => {
+      if (rewindClickTimeoutRef.current) clearTimeout(rewindClickTimeoutRef.current)
+      if (forwardClickTimeoutRef.current) clearTimeout(forwardClickTimeoutRef.current)
+    }
+  }, [])
 
   const current = useMemo(() => videos[currentIndex], [videos, currentIndex])
 
@@ -165,6 +177,65 @@ export function VideoPlayer({
       loadIndex(next)
     }
   }, [currentIndex, videos.length, isRandom, loadIndex])
+
+  // Handle rewind button clicks (single click = -5s, double click = previous video)
+  const handleRewindClick = useCallback(() => {
+    rewindClickCountRef.current += 1
+
+    if (rewindClickCountRef.current === 1) {
+      // First click - rewind 5 seconds
+      if (videoRef.current) {
+        videoRef.current.currentTime = Math.max(0, videoRef.current.currentTime - 5)
+      }
+
+      // Set timeout to check for double click
+      if (rewindClickTimeoutRef.current) {
+        clearTimeout(rewindClickTimeoutRef.current)
+      }
+
+      rewindClickTimeoutRef.current = window.setTimeout(() => {
+        rewindClickCountRef.current = 0
+      }, 300)
+    } else if (rewindClickCountRef.current === 2) {
+      // Double click - go to previous video
+      if (rewindClickTimeoutRef.current) {
+        clearTimeout(rewindClickTimeoutRef.current)
+      }
+      rewindClickCountRef.current = 0
+      onPrev()
+    }
+  }, [onPrev])
+
+  // Handle forward button clicks (single click = +5s, double click = next video)
+  const handleForwardClick = useCallback(() => {
+    forwardClickCountRef.current += 1
+
+    if (forwardClickCountRef.current === 1) {
+      // First click - forward 5 seconds
+      if (videoRef.current) {
+        videoRef.current.currentTime = Math.min(
+          videoRef.current.duration || 0,
+          videoRef.current.currentTime + 5
+        )
+      }
+
+      // Set timeout to check for double click
+      if (forwardClickTimeoutRef.current) {
+        clearTimeout(forwardClickTimeoutRef.current)
+      }
+
+      forwardClickTimeoutRef.current = window.setTimeout(() => {
+        forwardClickCountRef.current = 0
+      }, 300)
+    } else if (forwardClickCountRef.current === 2) {
+      // Double click - go to next video
+      if (forwardClickTimeoutRef.current) {
+        clearTimeout(forwardClickTimeoutRef.current)
+      }
+      forwardClickCountRef.current = 0
+      onNext()
+    }
+  }, [onNext])
 
   const onEnded = useCallback(() => {
     if (isRandom) onNext()
@@ -414,36 +485,158 @@ export function VideoPlayer({
         </div>
 
         {currentSource ? (
-          <video
-            ref={videoRef}
-            id="video-player"
-            onClick={() => {
-              setShowControls(true)
-              if (hideTimeout.current) window.clearTimeout(hideTimeout.current)
-              hideTimeout.current = window.setTimeout(() => {
-                if (!videoRef.current?.paused) setShowControls(false)
-              }, 3000)
-              onTogglePlay()
-            }}
-            onPlay={onPlay}
-            onPause={onPause}
-            onEnded={onEnded}
-            onTimeUpdate={onTimeUpdate}
-            onLoadedData={onLoadedData}
-            src={currentSource}
-            autoPlay
-            playsInline
+          <div
             style={{
               width: '100%',
               height: isFullscreen ? '100%' : 'auto',
               minHeight: "100%",
               flex: 1,
               borderRadius: '12px',
-              background: 'transparent',
-              objectFit: 'contain',
-              ...videoStyle,
+              overflow: 'hidden',
             }}
-          />
+          >
+            <video
+              ref={videoRef}
+              id="video-player"
+              onClick={() => {
+                setShowControls(true)
+                if (hideTimeout.current) window.clearTimeout(hideTimeout.current)
+                hideTimeout.current = window.setTimeout(() => {
+                  if (!videoRef.current?.paused) setShowControls(false)
+                }, 3000)
+                onTogglePlay()
+              }}
+              onPlay={onPlay}
+              onPause={onPause}
+              onEnded={onEnded}
+              onTimeUpdate={onTimeUpdate}
+              onLoadedData={onLoadedData}
+              src={currentSource}
+              autoPlay
+              playsInline
+              style={{
+                width: '100%',
+                height: '100%',
+                background: 'transparent',
+                objectFit: 'contain',
+                display: 'block',
+                ...videoStyle,
+              }}
+            />
+
+            {/* Invisible Control Buttons Overlay */}
+            <div
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr 1fr',
+                gap: 0,
+                zIndex: 5,
+              }}
+            >
+              {/* Left Button - Rewind */}
+              <button
+                className="invisible-control-btn rewind-btn"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  handleRewindClick()
+                }}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  position: 'relative',
+                }}
+                title="Retroceder 5s (duplo clique para anterior)"
+              >
+                <div
+                  style={{
+                    fontSize: '40px',
+                    color: 'rgba(255, 255, 255, 0)',
+                    transition: 'all 0.2s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                  className="rewind-icon"
+                >
+                  <i className="fa-solid fa-backward-step"></i>
+                </div>
+              </button>
+
+              {/* Center Button - Play/Pause */}
+              <button
+                className="invisible-control-btn play-pause-overlay-btn"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onTogglePlay()
+                }}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+                title="Pausar/Reproduzir"
+              >
+                <div
+                  style={{
+                    fontSize: '50px',
+                    color: 'rgba(255, 255, 255, 0)',
+                    transition: 'all 0.2s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                  className="play-pause-overlay-icon"
+                >
+                  <i className={`fa-solid ${isPlaying ? 'fa-pause' : 'fa-play'}`}></i>
+                </div>
+              </button>
+
+              {/* Right Button - Forward */}
+              <button
+                className="invisible-control-btn forward-btn"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  handleForwardClick()
+                }}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  position: 'relative',
+                }}
+                title="Avançar 5s (duplo clique para próximo)"
+              >
+                <div
+                  style={{
+                    fontSize: '40px',
+                    color: 'rgba(255, 255, 255, 0)',
+                    transition: 'all 0.2s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                  className="forward-icon"
+                >
+                  <i className="fa-solid fa-forward-step"></i>
+                </div>
+              </button>
+            </div>
+          </div>
         ) : (
           <div style={{ padding: 16 }}>Fonte de vídeo inválida.</div>
         )}

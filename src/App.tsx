@@ -1,8 +1,14 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 import { MainNavbar } from './components/MainNavbar'
 import { useFetchVideos } from './hooks/useFetchVideos'
-import { GalleryPage } from './pages/GalleryPage'
-import { PlayerPage } from './pages/PlayerPage'
+import { lazy } from 'react'
+const PlayerPage = lazy(() => 
+  import('./pages/PlayerPage').then(module => ({ default: module.PlayerPage }))
+);
+
+const GalleryPage = lazy(() => 
+  import('./pages/GalleryPage').then(module => ({ default: module.GalleryPage }))
+);
 
 export default function App() {
   const { videos, error } = useFetchVideos()

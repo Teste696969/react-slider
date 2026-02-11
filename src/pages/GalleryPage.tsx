@@ -118,7 +118,7 @@ export function GalleryPage({ videos }: GalleryPageProps) {
         <div
           className="gallery-container"
           style={{
-            width: '85vw',
+            width: '85vw',  
             display: 'grid',
             gridTemplateColumns: window.innerWidth <= 768 ? 'repeat(2, 1fr)' : 'repeat(auto-fit, minmax(300px, 1fr))',
             gap: "1px",
@@ -149,7 +149,8 @@ export function GalleryPage({ videos }: GalleryPageProps) {
               onBlur={() => handleCardLeave()}
               onClick={() => openDialog(video.id)}
             >
-              <img
+              <img 
+              loading="lazy"
                 src={video.thumbnail_url}
                 style={{ width: '100%', height: window.innerWidth <= 768 ? '120px' : '100%', aspectRatio: '16 / 9', borderRadius: "12px", objectFit: 'cover', background: '#000', pointerEvents: 'none' }}
               />

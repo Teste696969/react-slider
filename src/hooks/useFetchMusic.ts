@@ -3,14 +3,22 @@ import type { MusicItem } from '../types/music'
 
 export function useFetchMusic() {
   const [music, setMusic] = useState<MusicItem[]>([])
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    fetch('https://raw.githubusercontent.com/Teste696969/music-bunker/refs/heads/main/data.json')
+   useEffect(() => {
+    setLoading(true)
+    fetch('https://huggingface.co/datasets/Teste696969/bunker-musics/resolve/main/data.json')
       .then(response => response.json())
-      .then(setMusic)
-      .catch(e => setError(String(e)))
+      .then(data => {
+        setMusic(data)
+        setLoading(false)
+      })
+      .catch(e => {
+        setError(String(e))
+        setLoading(false)
+      })
   }, [])
 
-  return { music, error }
+  return { music, error, loading }
 }

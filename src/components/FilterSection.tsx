@@ -36,7 +36,8 @@ export function FilterSection({
   return (
     <section
       style={{
-        padding: '24px',
+        paddingTop: '24px',
+        paddingBottom: '24px',
         display: 'flex',
         flexDirection: 'column',
         gap: '24px',

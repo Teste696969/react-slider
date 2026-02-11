@@ -414,8 +414,9 @@ export function VideoPlayer({
   const currentSource = current.parts && current.parts.length > 0 ? current.parts[0].url : current.url
 
   return (
-    <div
-      style={{
+     <section
+        style={{
+          
         display: 'flex',
         flexDirection: 'column',
         gap: '16px',
@@ -485,6 +486,7 @@ export function VideoPlayer({
         </div>
 
         {currentSource ? (
+          
           <div
             style={{
               width: '100%',
@@ -654,7 +656,7 @@ export function VideoPlayer({
          </div>
         </div>
       </div>
-    </div>
+    </section>
   )
 }
 

@@ -191,10 +191,11 @@ export function MusicPlayer({
         return (
             <div style={{
                 padding: '20px',
-                background: '#1a1a1a',
+                background: 'linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%)',
                 color: '#ccc',
                 textAlign: 'center',
-                borderRadius: '8px',
+                borderRadius: '12px',
+                border: '1px solid #333',
                 ...containerStyle,
             }}>
                 Nenhuma música disponível
@@ -208,8 +209,10 @@ export function MusicPlayer({
         <div
             style={{
                 width: '100%',
-                padding: '0 24px 32px',
-                borderRadius: '8px',
+                padding: isMobile ? '16px' : '24px',
+                borderRadius: '12px',
+                background: 'linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%)',
+                border: '1px solid #333',
                 color: '#fff',
                 fontFamily: 'system-ui, -apple-system, sans-serif',
                 ...containerStyle,
@@ -224,196 +227,306 @@ export function MusicPlayer({
             />
 
             {/* Informações da música */}
-            <div style={{ marginBottom: '12px' }}>
-                <h3 style={{ marginBottom: '24px', fontSize: '22px', fontWeight: '600' }}>
+            <div style={{ marginBottom: isMobile ? '16px' : '20px' }}>
+                <h3 style={{ 
+                    margin: 0, 
+                    fontSize: isMobile ? '16px' : '18px', 
+                    fontWeight: '700',
+                    color: '#fff',
+                    marginBottom: '4px',
+                    lineHeight: '1.3',
+                    wordBreak: 'break-word'
+                }}>
                     {current?.title || 'Sem música'}
                 </h3>
-                {/* <p style={{ margin: '0', fontSize: '14px', color: '#888' }}>
-          Faixa {currentIndex + 1} de {music.length}
-        </p> */}
+                <p style={{ 
+                    margin: 0, 
+                    fontSize: isMobile ? '12px' : '13px', 
+                    color: '#888',
+                    marginBottom: '12px'
+                }}>
+                    Faixa {currentIndex + 1} de {music.length}
+                </p>
             </div>
 
-            {/* Progress bar */}
-            <input
-                type="range"
-                min="0"
-                max={duration || 0}
-                value={currentTime}
-                onChange={handleProgressChange}
-                style={{
-                    width: '100%',
-                    height: '6px',
-                    borderRadius: '2px',
-                    background: '#333',
-                    outline: 'none',
-                    cursor: 'pointer',
-                    marginBottom: '8px',
-                    accentColor: '#999',
-                }}
-            />
+            {/* Progress bar com melhor visual */}
+            <div style={{ marginBottom: '8px' }}>
+                <input
+                    type="range"
+                    min="0"
+                    max={duration || 0}
+                    value={currentTime}
+                    onChange={handleProgressChange}
+                    style={{
+                        width: '100%',
+                        height: '6px',
+                        borderRadius: '3px',
+                        background: '#333',
+                        outline: 'none',
+                        cursor: 'pointer',
+                        accentColor: '#ff8533',
+                        WebkitAppearance: 'none',
+                    } as any}
+                />
+            </div>
 
             {/* Tempo */}
             <div style={{
                 display: 'flex',
                 justifyContent: 'space-between',
-                fontSize: '12px',
+                fontSize: isMobile ? '11px' : '12px',
                 color: '#666',
-                marginBottom: '12px',
+                marginBottom: isMobile ? '14px' : '16px',
             }}>
                 <span>{formatTime(currentTime)}</span>
                 <span>{formatTime(duration)}</span>
             </div>
 
-            {/* Controles */}
+            {/* Controles principais */}
             <div style={{
                 display: 'flex',
-                gap: '6px',
-                justifyContent: 'center',
-                alignItems: 'center',
                 flexDirection: isMobile ? 'column' : 'row',
+                gap: isMobile ? '12px' : '16px',
+                alignItems: 'center',
+                justifyContent: 'space-between',
             }}>
-                <div
-                    style={{ display: "flex", gap: "12px", marginBottom: isMobile ? '12px' : '0' }}>
-                    <div
-                        style={{ display: "flex", gap: "8px" }}>
-                        <button
-                            onClick={handlePreviousTrack}
-                            style={{
-                                padding: '6px 10px',
-                                background: '#222',
-                                color: '#ccc',
-                                border: 'none',
-                                borderRadius: '4px',
-                                cursor: 'pointer',
-                                fontSize: '12px',
-                                transition: 'all 0.2s',
-                            }}
-                            onMouseEnter={(e) => { e.currentTarget.style.background = '#333'; e.currentTarget.style.color = '#fff' }}
-                            onMouseLeave={(e) => { e.currentTarget.style.background = '#222'; e.currentTarget.style.color = '#ccc' }}
-                        >
-                            <SkipBack />
-                        </button>
-
-                        <button
-                            onClick={handlePlayPause}
-                            style={{
-                                padding: '8px 12px',
-                                background: '#ff8533',
-                                color: '#fff',
-                                border: 'none',
-                                borderRadius: '4px',
-                                cursor: 'pointer',
-                                fontSize: '12px',
-                                fontWeight: '500',
-                                transition: 'all 0.2s',
-                            }}
-                            onMouseEnter={(e) => { e.currentTarget.style.background = '#333'; e.currentTarget.style.color = '#fff' }}
-                            onMouseLeave={(e) => e.currentTarget.style.background = '#ff8533'}
-                        >
-                            {isPlaying ? <Pause /> : <Play />}
-                        </button>
-
-                        <button
-                            onClick={handleNextTrack}
-                            style={{
-                                padding: '6px 10px',
-                                background: '#222',
-                                color: '#ccc',
-                                border: 'none',
-                                borderRadius: '4px',
-                                cursor: 'pointer',
-                                fontSize: '12px',
-                                transition: 'all 0.2s',
-                            }}
-                            onMouseEnter={(e) => { e.currentTarget.style.background = '#333'; e.currentTarget.style.color = '#fff' }}
-                            onMouseLeave={(e) => { e.currentTarget.style.background = '#222'; e.currentTarget.style.color = '#ccc' }}
-                        >
-                            <SkipForward />
-                        </button>
-                    </div>
-
-                    <div style={{ flex: 1 }} />
-                    <div
-                        style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-                        <button
-                            onClick={handleToggleRandom}
-                            style={{
-                                padding: '6px 8px',
-                                background: isRandom ? '#ff8533' : '#222',
-                                color: isRandom ? '#fff' : '#666',
-                                border: 'none',
-                                borderRadius: '4px',
-                                cursor: 'pointer',
-                                fontSize: '10px',
-                                transition: 'all 0.2s',
-                                opacity: isRandom ? 1 : 0.7,
-                            }}
-                            onMouseEnter={(e) => { e.currentTarget.style.background = '#333'; e.currentTarget.style.color = '#fff' }}
-                            onMouseLeave={(e) => { e.currentTarget.style.background = isRandom ? '#ff8533' : '#222' }}
-                        >
-                            <Shuffle />
-                        </button>
-
-                        <button
-                            onClick={handleToggleLoop}
-                            style={{
-                                padding: '6px 8px',
-                                background: isLoop ? '#ff8533' : '#222',
-                                color: isLoop ? '#fff' : '#666',
-                                border: 'none',
-                                borderRadius: '4px',
-                                cursor: 'pointer',
-                                fontSize: '10px',
-                                transition: 'all 0.2s',
-                                opacity: isLoop ? 1 : 0.7,
-                            }}
-                            onMouseEnter={(e) => { e.currentTarget.style.background = '#333'; e.currentTarget.style.color = '#fff' }}
-                            onMouseLeave={(e) => { e.currentTarget.style.background = isLoop ? '#ff8533' : '#222' }}
-                        >
-                            <Repeat />
-                        </button>
-                    </div>
-
-                </div>
-                <div
-                    style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                {/* Botões esquerda e centro */}
+                <div style={{
+                    display: 'flex',
+                    gap: isMobile ? '16px' : '12px',
+                    alignItems: 'center',
+                    justifyContent: isMobile ? 'center' : 'flex-start',
+                    width: isMobile ? '100%' : 'auto'
+                }}>
+                    {/* Skip anterior */}
                     <button
-                        onClick={handleToggleMute}
+                        onClick={handlePreviousTrack}
                         style={{
-                            padding: '6px 8px',
+                            padding: '8px',
                             background: '#222',
-                            color: muted ? '#666' : '#ccc',
+                            color: '#ccc',
                             border: 'none',
-                            borderRadius: '4px',
+                            borderRadius: '6px',
                             cursor: 'pointer',
-                            fontSize: '10px',
-                            transition: 'all 0.2s',
-                            opacity: 0.7,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            transition: 'all 0.2s ease',
+                            width: isMobile ? '44px' : '36px',
+                            height: isMobile ? '44px' : '36px',
                         }}
-                        onMouseEnter={(e) => { e.currentTarget.style.background = '#333'; e.currentTarget.style.color = '#fff' }}
-                        onMouseLeave={(e) => { e.currentTarget.style.opacity = '0.7'; e.currentTarget.style.background = '#222' }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.background = '#333'
+                            e.currentTarget.style.color = '#fff'
+                            e.currentTarget.style.transform = 'scale(1.05)'
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.background = '#222'
+                            e.currentTarget.style.color = '#ccc'
+                            e.currentTarget.style.transform = 'scale(1)'
+                        }}
                     >
-                        {muted ? <VolumeOff /> : <Volume2 />}
+                        <SkipBack size={isMobile ? 22 : 18} />
                     </button>
 
-                    <input
-                        type="range"
-                        min="0"
-                        max="100"
-                        value={muted ? 0 : volume}
-                        onChange={handleVolumeChange}
-                        disabled={muted}
+                    {/* Play/Pause */}
+                    <button
+                        onClick={handlePlayPause}
                         style={{
-                            width: '100px',
-                            height: '6px',
-                            borderRadius: '2px',
-                            background: '#333',
-                            outline: 'none',
-                            cursor: muted ? 'not-allowed' : 'pointer',
-                            opacity: muted ? 0.5 : 1,
-                            accentColor: '#666',
+                            padding: '10px',
+                            background: '#ff8533',
+                            color: '#fff',
+                            border: 'none',
+                            borderRadius: '6px',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            transition: 'all 0.2s ease',
+                            width: isMobile ? '56px' : '44px',
+                            height: isMobile ? '56px' : '44px',
+                            fontWeight: '600',
                         }}
-                    />
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.background = '#ff7020'
+                            e.currentTarget.style.transform = 'scale(1.08)'
+                            e.currentTarget.style.boxShadow = '0 4px 12px rgba(255, 133, 51, 0.3)'
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.background = '#ff8533'
+                            e.currentTarget.style.transform = 'scale(1)'
+                            e.currentTarget.style.boxShadow = 'none'
+                        }}
+                    >
+                        {isPlaying ? <Pause size={isMobile ? 28 : 20} /> : <Play size={isMobile ? 28 : 20} />}
+                    </button>
+
+                    {/* Skip próximo */}
+                    <button
+                        onClick={handleNextTrack}
+                        style={{
+                            padding: '8px',
+                            background: '#222',
+                            color: '#ccc',
+                            border: 'none',
+                            borderRadius: '6px',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            transition: 'all 0.2s ease',
+                            width: isMobile ? '44px' : '36px',
+                            height: isMobile ? '44px' : '36px',
+                        }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.background = '#333'
+                            e.currentTarget.style.color = '#fff'
+                            e.currentTarget.style.transform = 'scale(1.05)'
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.background = '#222'
+                            e.currentTarget.style.color = '#ccc'
+                            e.currentTarget.style.transform = 'scale(1)'
+                        }}
+                    >
+                        <SkipForward size={isMobile ? 22 : 18} />
+                    </button>
+
+                    {/* Espaço flexível no mobile */}
+                    {!isMobile && <div style={{ flex: 1 }} />}
+                </div>
+
+                {/* Botões direita */}
+                <div style={{
+                    display: 'flex',
+                    gap: isMobile ? '12px' : '12px',
+                    alignItems: 'center',
+                    width: isMobile ? '100%' : 'auto',
+                    justifyContent: isMobile ? 'space-around' : 'flex-start'
+                }}>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                        {/* Shuffle */}
+                        <button
+                            onClick={handleToggleRandom}
+                            title="Modo aleatório"
+                            style={{
+                                padding: '6px',
+                                background: isRandom ? '#ff8533' : '#222',
+                                color: isRandom ? '#fff' : '#888',
+                                border: 'none',
+                                borderRadius: '6px',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                transition: 'all 0.2s ease',
+                                width: isMobile ? '40px' : '34px',
+                                height: isMobile ? '40px' : '34px',
+                                fontSize: '14px',
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.background = isRandom ? '#ff7020' : '#333'
+                                e.currentTarget.style.color = '#fff'
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.background = isRandom ? '#ff8533' : '#222'
+                                e.currentTarget.style.color = isRandom ? '#fff' : '#888'
+                            }}
+                        >
+                            <Shuffle size={isMobile ? 18 : 16} />
+                        </button>
+
+                        {/* Loop */}
+                        <button
+                            onClick={handleToggleLoop}
+                            title="Modo repetição"
+                            style={{
+                                padding: '6px',
+                                background: isLoop ? '#ff8533' : '#222',
+                                color: isLoop ? '#fff' : '#888',
+                                border: 'none',
+                                borderRadius: '6px',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                transition: 'all 0.2s ease',
+                                width: isMobile ? '40px' : '34px',
+                                height: isMobile ? '40px' : '34px',
+                                fontSize: '14px',
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.background = isLoop ? '#ff7020' : '#333'
+                                e.currentTarget.style.color = '#fff'
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.background = isLoop ? '#ff8533' : '#222'
+                                e.currentTarget.style.color = isLoop ? '#fff' : '#888'
+                            }}
+                        >
+                            <Repeat size={isMobile ? 18 : 16} />
+                        </button>
+                    </div>
+
+                    {/* Volume */}
+                    <div style={{
+                        display: isMobile ? 'none' : 'flex',
+                        gap: '8px',
+                        alignItems: 'center',
+                        background: 'rgba(255, 133, 51, 0.05)',
+                        padding: '6px 12px',
+                        borderRadius: '6px',
+                    }}>
+                        <button
+                            onClick={handleToggleMute}
+                            title={muted ? 'Desmutar' : 'Mutar'}
+                            style={{
+                                padding: '4px',
+                                background: 'transparent',
+                                color: muted ? '#666' : '#ccc',
+                                border: 'none',
+                                borderRadius: '4px',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                transition: 'all 0.2s ease',
+                                width: '28px',
+                                height: '28px',
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.background = 'rgba(255, 133, 51, 0.1)'
+                                e.currentTarget.style.color = '#ff8533'
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.background = 'transparent'
+                                e.currentTarget.style.color = muted ? '#666' : '#ccc'
+                            }}
+                        >
+                            {muted ? <VolumeOff size={16} /> : <Volume2 size={16} />}
+                        </button>
+
+                        <input
+                            type="range"
+                            min="0"
+                            max="100"
+                            value={muted ? 0 : volume}
+                            onChange={handleVolumeChange}
+                            disabled={muted}
+                            title={`Volume: ${volume}%`}
+                            style={{
+                                width: '80px',
+                                height: '4px',
+                                borderRadius: '2px',
+                                background: '#333',
+                                outline: 'none',
+                                cursor: muted ? 'not-allowed' : 'pointer',
+                                opacity: muted ? 0.4 : 1,
+                                accentColor: '#ff8533',
+                                transition: 'all 0.2s ease',
+                            } as any}
+                        />
+                    </div>
                 </div>
             </div>
         </div>

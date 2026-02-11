@@ -510,64 +510,68 @@ export function MusicPlayer({
           </div>
 
           {/* Volume */}
-          {/* <div style={{
-                        display: isMobile ? 'none' : 'flex',
-                        gap: '8px',
-                        alignItems: 'center',
-                        background: 'rgba(255, 133, 51, 0.05)',
-                        padding: '6px 12px',
-                        borderRadius: '6px',
-                    }}>
-                        <button
-                            onClick={handleToggleMute}
-                            title={muted ? 'Desmutar' : 'Mutar'}
-                            style={{
-                                padding: '4px',
-                                background: 'transparent',
-                                color: muted ? '#666' : '#ccc',
-                                border: 'none',
-                                borderRadius: '4px',
-                                cursor: 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                transition: 'all 0.2s ease',
-                                width: '28px',
-                                height: '28px',
-                            }}
-                            onMouseEnter={(e) => {
-                                e.currentTarget.style.background = 'rgba(255, 133, 51, 0.1)'
-                                e.currentTarget.style.color = '#ff8533'
-                            }}
-                            onMouseLeave={(e) => {
-                                e.currentTarget.style.background = 'transparent'
-                                e.currentTarget.style.color = muted ? '#666' : '#ccc'
-                            }}
-                        >
-                            {muted ? <VolumeOff size={16} /> : <Volume2 size={16} />}
-                        </button>
+          <div
+            style={{
+              display: isMobile ? "none" : "none",
+              gap: "8px",
+              alignItems: "center",
+              background: "rgba(255, 133, 51, 0.05)",
+              padding: "6px 12px",
+              borderRadius: "6px",
+            }}
+          >
+            <button
+              onClick={handleToggleMute}
+              title={muted ? "Desmutar" : "Mutar"}
+              style={{
+                padding: "4px",
+                background: "transparent",
+                color: muted ? "#666" : "#ccc",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                transition: "all 0.2s ease",
+                width: "28px",
+                height: "28px",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "rgba(255, 133, 51, 0.1)";
+                e.currentTarget.style.color = "#ff8533";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "transparent";
+                e.currentTarget.style.color = muted ? "#666" : "#ccc";
+              }}
+            >
+              {muted ? <VolumeOff size={16} /> : <Volume2 size={16} />}
+            </button>
 
-                        <input
-                            type="range"
-                            min="0"
-                            max="100"
-                            value={muted ? 0 : volume}
-                            onChange={handleVolumeChange}
-                            disabled={muted}
-                            title={`Volume: ${volume}%`}
-                            style={{
-                                width: '80px',
-                                height: '4px',
-                                borderRadius: '2px',
-                                background: '#333',
-                                outline: 'none',
-                                cursor: muted ? 'not-allowed' : 'pointer',
-                                opacity: muted ? 0.4 : 1,
-                                accentColor: '#ff8533',
-                                transition: 'all 0.2s ease',
-                            } as any}
-                        />
-                    </div> */}
+            <input
+              type="range"
+              min="0"
+              max="100"
+              value={muted ? 0 : volume}
+              onChange={handleVolumeChange}
+              disabled={muted}
+              title={`Volume: ${volume}%`}
+              style={
+                {
+                  width: "80px",
+                  height: "4px",
+                  borderRadius: "2px",
+                  background: "#333",
+                  outline: "none",
+                  cursor: muted ? "not-allowed" : "pointer",
+                  opacity: muted ? 0.4 : 1,
+                  accentColor: "#ff8533",
+                  transition: "all 0.2s ease",
+                } as any
+              }
+            />
+          </div>
         </div>
       </div>
     </div>

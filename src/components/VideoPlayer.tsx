@@ -437,16 +437,15 @@ export function VideoPlayer({
         minHeight: isFullscreen
           ? "100vh"
           : window.innerWidth <= 768
-            ? "400px"
+            ? "600px"
             : "auto",
         maxHeight: isFullscreen
           ? "100vh"
           : window.innerWidth <= 768
-            ? "400px"
+            ? "600px"
             : "900px",
         width: "100%",
         margin: "0 auto",
-        padding: window.innerWidth <= 768 ? "0" : "0 clamp(12px, 4vw, 24px)",
         ...containerStyle,
       }}
     >

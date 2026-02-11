@@ -6,7 +6,6 @@ import { FilterSection } from "../components/FilterSection";
 import { useVideoFilters } from "../hooks/useVideoFilters";
 import { useFetchMusic } from "../hooks/useFetchMusic";
 import type { VideoItem } from "../types/video";
-import { useIsMobile } from "../hooks/useMobile";
 
 type PlayerPageProps = {
   videos: VideoItem[];
@@ -38,8 +37,6 @@ export function PlayerPage({ videos }: PlayerPageProps) {
     addCategoriesFromVideo,
     addArtistFromVideo,
   } = useVideoFilters(videos);
-
-  const isMobile = useIsMobile();
 
   useEffect(() => {
     const requestedVideoId = searchParams.get("videoId") || undefined;
@@ -76,137 +73,109 @@ export function PlayerPage({ videos }: PlayerPageProps) {
         backgroundColor: "#121212",
         minHeight: "100vh",
         display: "flex",
-        flexDirection: "column",
+        flexDirection: window.innerWidth <= 768 ? "column" : "row",
+        gap: "24px",
+        padding: window.innerWidth <= 768 ? "0 8px" : "24px 12px",
         color: "#fff",
       }}
     >
-      {isMobile && (
-        <>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          width: window.innerWidth <= 768 ? "100%" : "25%",
+          alignItems: window.innerWidth <= 768 ? "center" : "flex-start",
+        }}
+      >
+        <FilterSection
+          searchInput={searchInput}
+          selectedArtists={selectedArtists}
+          selectedCategories={selectedCategories}
+          randomArtists={randomArtists}
+          allCategories={allCategories}
+          searchSuggestions={searchSuggestions}
+          showSuggestions={showSuggestions}
+          onSearchInputChange={setSearchInput}
+          onSearchFocus={() => setShowSuggestions(true)}
+          onSearchBlur={() => setShowSuggestions(false)}
+          onAddArtist={addArtist}
+          onAddCategory={addCategory}
+          onRemoveArtist={removeArtist}
+          onRemoveCategory={removeCategory}
+        />
+
+        {music.length > 0 && window.innerWidth > 768 && (
           <div
             style={{
               width: "100%",
-              alignItems: "center",
               display: "flex",
-              flexDirection: "column",
-              padding: "0 8px",
+              paddingLeft: "8px",
+              paddingRight: "8px",
+              justifyContent: "center",
+              marginTop: "24px",
             }}
           >
-            <FilterSection
-              searchInput={searchInput}
-              selectedArtists={selectedArtists}
-              selectedCategories={selectedCategories}
-              randomArtists={randomArtists}
-              allCategories={allCategories}
-              searchSuggestions={searchSuggestions}
-              showSuggestions={showSuggestions}
-              onSearchInputChange={setSearchInput}
-              onSearchFocus={() => setShowSuggestions(true)}
-              onSearchBlur={() => setShowSuggestions(false)}
-              onAddArtist={addArtist}
-              onAddCategory={addCategory}
-              onRemoveArtist={removeArtist}
-              onRemoveCategory={removeCategory}
+            <MusicPlayer
+              music={music}
+              autoPlay={true}
+              autoLoop={false}
+              autoRandom={true}
+              currentVideo={currentVideo}
+              containerStyle={{
+                width: "100%",
+              }}
             />
-
-            <div style={{ width: "100%", padding: "24px 8px" }}>
-              <VideoPlayer
-                containerStyle={{ width: "100%" }}
-                videos={filtered}
-                initialVideoId={initialVideoId}
-                autoRandom
-                onVideoChange={setCurrentVideo}
-              />
-            </div>
-
-            {music.length > 0 && (
-              <div
-                style={{
-                  width: "100%",
-                  padding: "24px 8px",
-                  display: "flex",
-                  justifyContent: "center",
-                }}
-              >
-                <MusicPlayer
-                  music={music}
-                  autoPlay={true}
-                  autoLoop={false}
-                  autoRandom={true}
-                  currentVideo={currentVideo}
-                  containerStyle={{
-                    width: "100%",
-                    margin: "0 auto",
-                  }}
-                />
-              </div>
-            )}
           </div>
-        </>
-      )}
+        )}
+      </div>
 
-      {!isMobile && (
-        <>
+      <div
+        style={{
+          flex: window.innerWidth <= 768 ? "none" : 1,
+          width: window.innerWidth <= 768 ? "100%" : "auto",
+          display: "flex",
+          flexDirection: "column",
+          gap: "24px",
+        }}
+      >
+        <div
+          style={{
+            width: "100%",
+            padding: window.innerWidth <= 768 ? "12px 8px" : "0",
+          }}
+        >
+          <VideoPlayer
+            containerStyle={{ width: "100%" }}
+            videos={filtered}
+            initialVideoId={initialVideoId}
+            autoRandom
+            onVideoChange={setCurrentVideo}
+          />
+        </div>
+
+        {music.length > 0 && window.innerWidth <= 768 && (
           <div
             style={{
               width: "100%",
+              padding: "14px 8px",
               display: "flex",
-              padding: "24px 12px",
-              flexDirection: "row",
+              justifyContent: "center",
             }}
           >
-            <div
-              style={{ display: "flex", flexDirection: "column", width: "25%" }}
-            >
-              <FilterSection
-                searchInput={searchInput}
-                selectedArtists={selectedArtists}
-                selectedCategories={selectedCategories}
-                randomArtists={randomArtists}
-                allCategories={allCategories}
-                searchSuggestions={searchSuggestions}
-                showSuggestions={showSuggestions}
-                onSearchInputChange={setSearchInput}
-                onSearchFocus={() => setShowSuggestions(true)}
-                onSearchBlur={() => setShowSuggestions(false)}
-                onAddArtist={addArtist}
-                onAddCategory={addCategory}
-                onRemoveArtist={removeArtist}
-                onRemoveCategory={removeCategory}
-              />
-
-              {music.length > 0 && (
-                <div
-                  style={{
-                    width: "100%",
-                    display: "flex",
-                    justifyContent: "center",
-                  }}
-                >
-                  <MusicPlayer
-                    music={music}
-                    autoPlay={true}
-                    autoLoop={false}
-                    autoRandom={true}
-                    containerStyle={{
-                      width: "100%",
-                    }}
-                  />
-                </div>
-              )}
-            </div>
-
-            <div style={{ width: "100%" }}>
-              <VideoPlayer
-                containerStyle={{ width: "100%" }}
-                videos={filtered}
-                initialVideoId={initialVideoId}
-                autoRandom
-                onVideoChange={setCurrentVideo}
-              />
-            </div>
+            <MusicPlayer
+              music={music}
+              autoPlay={true}
+              autoLoop={false}
+              autoRandom={true}
+              currentVideo={currentVideo}
+              containerStyle={{
+                width: "100%",
+                margin: "0 auto",
+              }}
+            />
           </div>
-        </>
-      )}
+        )}
+      </div>
     </div>
   );
 }

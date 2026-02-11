@@ -1,9 +1,4 @@
-import {
-  BrowserRouter as Router,
-  Route,
-  Routes,
-  Outlet,
-} from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { MainNavbar } from "./components/MainNavbar";
 import { useFetchVideos } from "./hooks/useFetchVideos";
 import { lazy, Suspense } from "react";

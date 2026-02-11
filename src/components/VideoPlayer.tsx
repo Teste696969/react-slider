@@ -6,7 +6,6 @@ import React, {
   useState,
 } from "react";
 import type { VideoItem } from "../types/video";
-import screenfull from "screenfull";
 
 type VideoPlayerProps = {
   videos: VideoItem[];
@@ -261,15 +260,32 @@ export function VideoPlayer({
     }
   }, [currentIndex, videos.length, isRandom, loadIndex, onNext]);
 
-  const toggleFullscreen = (e?: React.MouseEvent) => {
-    e?.stopPropagation();
-    e?.preventDefault();
-
+  const toggleFullscreen = useCallback(async () => {
     const container = containerRef.current;
-    if (!container || !screenfull.isEnabled) return;
+    if (!container) return;
 
-    screenfull.toggle(container);
-  };
+    try {
+      if (!document.fullscreenElement) {
+        await container.requestFullscreen();
+        // Trava em landscape (horizontal) no Android/Chrome
+        if (window.screen.orientation && "lock" in window.screen.orientation) {
+          await (window.screen.orientation as any)
+            .lock("landscape-primary")
+            .catch(() => {});
+        }
+      } else {
+        if (
+          window.screen.orientation &&
+          "unlock" in window.screen.orientation
+        ) {
+          window.screen.orientation.unlock();
+        }
+        await document.exitFullscreen();
+      }
+    } catch (err) {
+      console.error("Erro ao alternar fullscreen:", err);
+    }
+  }, []);
 
   const onKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -434,16 +450,6 @@ export function VideoPlayer({
         display: "flex",
         flexDirection: "column",
         gap: "16px",
-        minHeight: isFullscreen
-          ? "100vh"
-          : window.innerWidth <= 768
-            ? "640px"
-            : "540px",
-        maxHeight: isFullscreen
-          ? "100vh"
-          : window.innerWidth <= 768
-            ? "640px"
-            : "600px",
         width: "100%",
         margin: "0 auto",
         ...containerStyle,
@@ -454,6 +460,8 @@ export function VideoPlayer({
         className={`video-container ${showControls ? "" : "paused"} ${isScrubbing ? "scrubbing" : ""} ${isFullscreen ? "full-screen" : ""}`}
         data-volume-level={muted ? "muted" : volume >= 0.5 ? "high" : "low"}
         style={{
+          position: "relative",
+          aspectRatio: isFullscreen ? "auto" : "16 / 9",
           cursor: showControls ? "default" : "none",
           display: "flex",
           flexDirection: "column",
@@ -541,10 +549,7 @@ export function VideoPlayer({
             >
               <i className="fa-solid fa-repeat"></i>
             </button>
-            <button
-              className="full-screen-btn"
-              onClick={(e) => toggleFullscreen(e)}
-            >
+            <button className="full-screen-btn" onClick={toggleFullscreen}>
               <i className="fa-solid fa-expand"></i>
             </button>
           </div>
@@ -561,7 +566,7 @@ export function VideoPlayer({
               overflow: "hidden",
               alignItems: "center",
               justifyContent: "center",
-              position: "relative",
+              position: "absolute",
             }}
           >
             <video

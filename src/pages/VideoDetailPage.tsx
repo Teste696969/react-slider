@@ -4,6 +4,7 @@ import { VideoPlayer } from "../components/VideoPlayer";
 import type { VideoItem } from "../types/video";
 import { useFetchMusic } from "../hooks/useFetchMusic";
 import { MusicPlayer } from "../components/MusicPlayer";
+import { useIsMobile } from "../hooks/useMobile";
 
 // Props: videos: VideoItem[]
 export function VideoDetailPage({ videos }: { videos: VideoItem[] }) {
@@ -37,7 +38,7 @@ export function VideoDetailPage({ videos }: { videos: VideoItem[] }) {
     );
   }
 
-  const isMobileLayout = window.innerWidth <= 768;
+  const isMobileLayout = useIsMobile();
 
   return (
     <div

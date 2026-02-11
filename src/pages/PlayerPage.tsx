@@ -6,6 +6,7 @@ import { FilterSection } from "../components/FilterSection";
 import { useVideoFilters } from "../hooks/useVideoFilters";
 import { useFetchMusic } from "../hooks/useFetchMusic";
 import type { VideoItem } from "../types/video";
+import { useIsMobile } from "../hooks/useMobile";
 
 type PlayerPageProps = {
   videos: VideoItem[];
@@ -67,15 +68,17 @@ export function PlayerPage({ videos }: PlayerPageProps) {
     addCategoriesFromVideo,
   ]);
 
+  const isMobileLayout = useIsMobile();
+
   return (
     <div
       style={{
         backgroundColor: "#121212",
         minHeight: "100vh",
         display: "flex",
-        flexDirection: window.innerWidth <= 768 ? "column" : "row",
+        flexDirection: isMobileLayout ? "column" : "row",
         gap: "24px",
-        padding: window.innerWidth <= 768 ? "0 8px" : "24px 12px",
+        padding: isMobileLayout ? "0 8px" : "24px 12px",
         color: "#fff",
       }}
     >
@@ -83,8 +86,8 @@ export function PlayerPage({ videos }: PlayerPageProps) {
         style={{
           display: "flex",
           flexDirection: "column",
-          width: window.innerWidth <= 768 ? "100%" : "25%",
-          alignItems: window.innerWidth <= 768 ? "center" : "flex-start",
+          width: isMobileLayout ? "100%" : "25%",
+          alignItems: isMobileLayout ? "center" : "flex-start",
         }}
       >
         <FilterSection
@@ -131,8 +134,8 @@ export function PlayerPage({ videos }: PlayerPageProps) {
 
       <div
         style={{
-          flex: window.innerWidth <= 768 ? "none" : 1,
-          width: window.innerWidth <= 768 ? "100%" : "auto",
+          flex: isMobileLayout ? "none" : 1,
+          width: isMobileLayout ? "100%" : "auto",
           display: "flex",
           flexDirection: "column",
           gap: "24px",
@@ -141,7 +144,7 @@ export function PlayerPage({ videos }: PlayerPageProps) {
         <div
           style={{
             width: "100%",
-            padding: window.innerWidth <= 768 ? "12px 8px" : "0",
+            padding: isMobileLayout ? "12px 8px" : "0",
           }}
         >
           <VideoPlayer
@@ -153,7 +156,7 @@ export function PlayerPage({ videos }: PlayerPageProps) {
           />
         </div>
 
-        {music.length > 0 && window.innerWidth <= 768 && (
+        {music.length > 0 && isMobileLayout && (
           <div
             style={{
               width: "100%",

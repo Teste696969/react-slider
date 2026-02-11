@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import { FilterSection } from '../components/FilterSection'
-import { useVideoFilters } from '../hooks/useVideoFilters'
-import type { VideoItem } from '../types/video'
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { FilterSection } from "../components/FilterSection";
+import { useVideoFilters } from "../hooks/useVideoFilters";
+import type { VideoItem } from "../types/video";
+import { useIsMobile } from "../hooks/useMobile";
 
 export function GalleryPage({ videos }: { videos: VideoItem[] }) {
   const [currentPage, setCurrentPage] = useState(1);
@@ -27,15 +28,21 @@ export function GalleryPage({ videos }: { videos: VideoItem[] }) {
     addCategory,
   } = useVideoFilters(videos);
 
-  const totalPages = useMemo(() => Math.ceil(filtered.length / itemsPerPage), [filtered.length, itemsPerPage]);
+  const totalPages = useMemo(
+    () => Math.ceil(filtered.length / itemsPerPage),
+    [filtered.length, itemsPerPage],
+  );
   const pageCount = Math.max(1, totalPages);
 
   const paginatedVideos = useMemo(() => {
-    return filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+    return filtered.slice(
+      (currentPage - 1) * itemsPerPage,
+      currentPage * itemsPerPage,
+    );
   }, [currentPage, itemsPerPage, filtered]);
 
   useEffect(() => {
-    setCurrentPage(prev => Math.min(prev, pageCount));
+    setCurrentPage((prev) => Math.min(prev, pageCount));
   }, [pageCount]);
 
   const pageNumbers = useMemo(() => {
@@ -70,196 +77,513 @@ export function GalleryPage({ videos }: { videos: VideoItem[] }) {
     }
   };
 
+  const isMobile = useIsMobile();
+
   return (
-    <div style={{ padding: window.innerWidth <= 768 ? '12px 8px' : 'clamp(16px, 5vw, 40px)', minHeight: '100vh', backgroundColor: '#121212', color: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'clamp(16px, 4vw, 32px)', width: '100%' }}>
-      <FilterSection
-        searchInput={searchInput}
-        selectedArtists={selectedArtists}
-        selectedCategories={selectedCategories}
-        randomArtists={randomArtists}
-        allCategories={allCategories}
-        searchSuggestions={searchSuggestions}
-        showSuggestions={showSuggestions}
-        onSearchInputChange={setSearchInput}
-        onSearchFocus={() => setShowSuggestions(true)}
-        onSearchBlur={() => setShowSuggestions(false)}
-        onAddArtist={addArtist}
-        onAddCategory={addCategory}
-        onRemoveArtist={removeArtist}
-        onRemoveCategory={removeCategory}
-      />
-      {filtered.length === 0 ? (
-        <div style={{ color: '#aaa', fontSize: '18px' }}>Nenhum vídeo disponível.</div>
-      ) : (
-        <div
-          className="gallery-container"
-          style={{  
-             width: '100%',  
-            display: 'grid',
-            gridTemplateColumns: window.innerWidth <= 768 ? 'repeat(2, 1fr)' : 'repeat(auto-fit, minmax(300px, 1fr))',
-            gap: "1px",
-            margin: '0 auto',
-            justifyItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          {paginatedVideos.map((video, index) => (
-            <div
-              key={`${video.id || video.url}-${index}`}
-              className="video-card"
-              style={{
-                width: '100%',
-                overflow: 'hidden',
-                maxWidth: "300px",
-                backgroundColor: "transparent",
-                transform: hoveredId === video.id ? 'translateY(-6px)' : 'translateY(0)',
-                transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-                display: 'flex',
-                flexDirection: 'column',
-                minHeight: '240px',
-                cursor: 'pointer',
-              }}
-              onMouseEnter={() => handleCardEnter(video.id)}
-              onMouseLeave={() => handleCardLeave()}
-              onFocus={() => handleCardEnter(video.id)}
-              onBlur={() => handleCardLeave()}
-              onClick={() => window.open(`/video/${video.id}`, '_blank')}
-            >
-              <img 
-              loading="lazy"
-                src={video.thumbnail_url}
-                style={{ width: '100%', height: window.innerWidth <= 768 ? '120px' : '100%', aspectRatio: '16 / 9', borderRadius: "12px", objectFit: 'cover', background: '#000', pointerEvents: 'none' }}
-              />
-              <div
-                className="video-info"
-                style={{ padding: '12px', textAlign: 'left', display: 'flex', flexDirection: 'column', gap: '6px' }}
-              >
-                <h3
-                  style={{
-                    fontSize: '16px',
-                    margin: 0,
-                    color: '#ffbb66',
-                    textOverflow: 'ellipsis',
-                    overflow: 'hidden',
-                    display: '-webkit-box',
-                    WebkitLineClamp: '2',
-                    WebkitBoxOrient: 'vertical',
-                  }}
-                >
-                  {video.title || video.autor}
-                </h3>
-                <p
-                  style={{
-                    fontSize: '14px',
-                    color: '#ccc',
-                    margin: 0,
-                    textOverflow: 'ellipsis',
-                    overflow: 'hidden',
-                    display: '-webkit-box',
-                    WebkitLineClamp: '1',
-                    WebkitBoxOrient: 'vertical',
-                  }}
-                >
-                  {video.autor}
-                </p>
-                <span style={{ fontSize: '12px', color: '#888', textTransform: 'uppercase' }}>
-                  {Array.isArray(video.categoria) ? video.categoria.join(', ') : video.categoria}
-                </span>
-              </div>
+    <div
+      style={{
+        backgroundColor: "#121212",
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        padding: "0 8px",
+        color: "#fff",
+      }}
+    >
+      {isMobile && (
+        <>
+          <FilterSection
+            searchInput={searchInput}
+            selectedArtists={selectedArtists}
+            selectedCategories={selectedCategories}
+            randomArtists={randomArtists}
+            allCategories={allCategories}
+            searchSuggestions={searchSuggestions}
+            showSuggestions={showSuggestions}
+            onSearchInputChange={setSearchInput}
+            onSearchFocus={() => setShowSuggestions(true)}
+            onSearchBlur={() => setShowSuggestions(false)}
+            onAddArtist={addArtist}
+            onAddCategory={addCategory}
+            onRemoveArtist={removeArtist}
+            onRemoveCategory={removeCategory}
+          />
+          {filtered.length === 0 ? (
+            <div style={{ color: "#aaa", fontSize: "18px" }}>
+              Nenhum vídeo disponível.
             </div>
-          ))}
-        </div>
-      )}
-  {filtered.length > 0 && (
-        <div
-          className="pagination"
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            gap: '12px',
-            flexWrap: 'wrap',
-            width: '100%',
-            maxWidth: '800px',
-            margin: '0 auto',
-          }}
-        >
-          <button
-            onClick={() => handlePageChange(1)}
-            disabled={currentPage === 1}
-            style={{
-              padding: '10px 16px',
-              background: currentPage === 1 ? '#1f1f1f' : '#333',
-              color: '#fff',
-              border: '1px solid #444',
-              borderRadius: '8px',
-              cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
-            }}
-          >
-            Início
-          </button>
-          <button
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-            style={{
-              padding: '10px 18px',
-              background: currentPage === 1 ? '#1f1f1f' : '#333',
-              color: '#fff',
-              border: '1px solid #444',
-              borderRadius: '999px',
-              cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
-            }}
-          >
-            Anterior
-          </button>
-          {pageNumbers.map(page => (
-            <button
-              key={page}
-              onClick={() => handlePageChange(page)}
+          ) : (
+            <div
+              className="gallery-container"
               style={{
-                padding: '10px 16px',
-                background: currentPage === page ? '#ff8533' : '#1f1f1f',
-                color: currentPage === page ? '#fff' : '#aaa',
-                border: '1px solid #333',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                minWidth: '48px',
+                width: "100%",
+                display: "grid",
+                gridTemplateColumns:
+                  window.innerWidth <= 768
+                    ? "repeat(2, 1fr)"
+                    : "repeat(auto-fit, minmax(300px, 1fr))",
+                gap: "1px",
+                margin: "0 auto",
+                justifyItems: "center",
+                justifyContent: "center",
               }}
             >
-              {page}
-            </button>
-          ))}
-          <button
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === pageCount}
+              {paginatedVideos.map((video, index) => (
+                <a
+                  key={`${video.id || video.url}-${index}`}
+                  href={`/video/${video.id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    textDecoration: "none",
+                    color: "inherit",
+                    width: "100%",
+                    maxWidth: "300px",
+                    display: "block",
+                  }}
+                  onMouseEnter={() => handleCardEnter(video.id)}
+                  onMouseLeave={() => handleCardLeave()}
+                  onFocus={() => handleCardEnter(video.id)}
+                  onBlur={() => handleCardLeave()}
+                >
+                  <div
+                    className="video-card"
+                    style={{
+                      width: "100%",
+                      overflow: "hidden",
+                      maxWidth: "300px",
+                      backgroundColor: "transparent",
+                      transform:
+                        hoveredId === video.id
+                          ? "translateY(-6px)"
+                          : "translateY(0)",
+                      transition: "transform 0.2s ease, box-shadow 0.2s ease",
+                      display: "flex",
+                      flexDirection: "column",
+                      minHeight: "240px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <img
+                      loading="lazy"
+                      src={video.thumbnail_url}
+                      style={{
+                        width: "100%",
+                        height: window.innerWidth <= 768 ? "120px" : "100%",
+                        aspectRatio: "16 / 9",
+                        borderRadius: "12px",
+                        objectFit: "cover",
+                        background: "#000",
+                        pointerEvents: "none",
+                      }}
+                    />
+                    <div
+                      className="video-info"
+                      style={{
+                        padding: "12px",
+                        textAlign: "left",
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "6px",
+                      }}
+                    >
+                      <h3
+                        style={{
+                          fontSize: "16px",
+                          margin: 0,
+                          color: "#ffbb66",
+                          textOverflow: "ellipsis",
+                          overflow: "hidden",
+                          display: "-webkit-box",
+                          WebkitLineClamp: "2",
+                          WebkitBoxOrient: "vertical",
+                        }}
+                      >
+                        {video.title || video.autor}
+                      </h3>
+                      <p
+                        style={{
+                          fontSize: "14px",
+                          color: "#ccc",
+                          margin: 0,
+                          textOverflow: "ellipsis",
+                          overflow: "hidden",
+                          display: "-webkit-box",
+                          WebkitLineClamp: "1",
+                          WebkitBoxOrient: "vertical",
+                        }}
+                      >
+                        {video.autor}
+                      </p>
+                      <span
+                        style={{
+                          fontSize: "12px",
+                          color: "#888",
+                          textTransform: "uppercase",
+                        }}
+                      >
+                        {Array.isArray(video.categoria)
+                          ? video.categoria.join(", ")
+                          : video.categoria}
+                      </span>
+                    </div>
+                  </div>
+                </a>
+              ))}
+            </div>
+          )}
+          {filtered.length > 0 && (
+            <div
+              className="pagination"
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                gap: "12px",
+                flexWrap: "wrap",
+                width: "100%",
+                maxWidth: "800px",
+                margin: "0 auto",
+              }}
+            >
+              <button
+                onClick={() => handlePageChange(1)}
+                disabled={currentPage === 1}
+                style={{
+                  padding: "10px 16px",
+                  background: currentPage === 1 ? "#1f1f1f" : "#333",
+                  color: "#fff",
+                  border: "1px solid #444",
+                  borderRadius: "8px",
+                  cursor: currentPage === 1 ? "not-allowed" : "pointer",
+                }}
+              >
+                Início
+              </button>
+              <button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                style={{
+                  padding: "10px 18px",
+                  background: currentPage === 1 ? "#1f1f1f" : "#333",
+                  color: "#fff",
+                  border: "1px solid #444",
+                  borderRadius: "999px",
+                  cursor: currentPage === 1 ? "not-allowed" : "pointer",
+                }}
+              >
+                Anterior
+              </button>
+              {pageNumbers.map((page) => (
+                <button
+                  key={page}
+                  onClick={() => handlePageChange(page)}
+                  style={{
+                    padding: "10px 16px",
+                    background: currentPage === page ? "#ff8533" : "#1f1f1f",
+                    color: currentPage === page ? "#fff" : "#aaa",
+                    border: "1px solid #333",
+                    borderRadius: "8px",
+                    cursor: "pointer",
+                    minWidth: "48px",
+                  }}
+                >
+                  {page}
+                </button>
+              ))}
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === pageCount}
+                style={{
+                  padding: "10px 18px",
+                  background: currentPage === pageCount ? "#1f1f1f" : "#333",
+                  color: "#fff",
+                  border: "1px solid #444",
+                  borderRadius: "999px",
+                  cursor: currentPage === pageCount ? "not-allowed" : "pointer",
+                }}
+              >
+                Próxima
+              </button>
+              <button
+                onClick={() => handlePageChange(pageCount)}
+                disabled={currentPage === pageCount}
+                style={{
+                  padding: "10px 16px",
+                  background: currentPage === pageCount ? "#1f1f1f" : "#333",
+                  color: "#fff",
+                  border: "1px solid #444",
+                  borderRadius: "8px",
+                  cursor: currentPage === pageCount ? "not-allowed" : "pointer",
+                }}
+              >
+                Fim
+              </button>
+            </div>
+          )}
+        </>
+      )}
+
+      {!isMobile && (
+        <>
+          <div
             style={{
-              padding: '10px 18px',
-              background: currentPage === pageCount ? '#1f1f1f' : '#333',
-              color: '#fff',
-              border: '1px solid #444',
-              borderRadius: '999px',
-              cursor: currentPage === pageCount ? 'not-allowed' : 'pointer',
+              width: "100%",
+              display: "flex",
+              padding: "24px 12px",
+              flexDirection: "row",
             }}
           >
-            Próxima
-          </button>
-          <button
-            onClick={() => handlePageChange(pageCount)}
-            disabled={currentPage === pageCount}
-            style={{
-              padding: '10px 16px',
-              background: currentPage === pageCount ? '#1f1f1f' : '#333',
-              color: '#fff',
-              border: '1px solid #444',
-              borderRadius: '8px',
-              cursor: currentPage === pageCount ? 'not-allowed' : 'pointer',
-            }}
-          >
-            Fim
-          </button>
-        </div>
+            <div
+              style={{ display: "flex", flexDirection: "column", width: "25%" }}
+            >
+              <FilterSection
+                searchInput={searchInput}
+                selectedArtists={selectedArtists}
+                selectedCategories={selectedCategories}
+                randomArtists={randomArtists}
+                allCategories={allCategories}
+                searchSuggestions={searchSuggestions}
+                showSuggestions={showSuggestions}
+                onSearchInputChange={setSearchInput}
+                onSearchFocus={() => setShowSuggestions(true)}
+                onSearchBlur={() => setShowSuggestions(false)}
+                onAddArtist={addArtist}
+                onAddCategory={addCategory}
+                onRemoveArtist={removeArtist}
+                onRemoveCategory={removeCategory}
+              />
+            </div>
+            {filtered.length === 0 ? (
+              <div style={{ color: "#aaa", fontSize: "18px" }}>
+                Nenhum vídeo disponível.
+              </div>
+            ) : (
+              <div
+                style={{
+                  flex: 1,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "24px",
+                }}
+              >
+                <div
+                  className="gallery-container"
+                  style={{
+                    width: "100%",
+                    display: "grid",
+                    gridTemplateColumns:
+                      window.innerWidth <= 768
+                        ? "repeat(2, 1fr)"
+                        : "repeat(5, 1fr)",
+                    margin: "0",
+                    justifyItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  {paginatedVideos.map((video, index) => (
+                    <a
+                      key={`${video.id || video.url}-${index}`}
+                      href={`/video/${video.id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        textDecoration: "none",
+                        color: "inherit",
+                        width: "100%",
+                        maxWidth: "300px",
+                        display: "block",
+                      }}
+                      onMouseEnter={() => handleCardEnter(video.id)}
+                      onMouseLeave={() => handleCardLeave()}
+                      onFocus={() => handleCardEnter(video.id)}
+                      onBlur={() => handleCardLeave()}
+                    >
+                      <div
+                        className="video-card"
+                        style={{
+                          width: "100%",
+                          overflow: "hidden",
+                          maxWidth: "300px",
+                          backgroundColor: "transparent",
+                          transform:
+                            hoveredId === video.id
+                              ? "translateY(-6px)"
+                              : "translateY(0)",
+                          transition:
+                            "transform 0.2s ease, box-shadow 0.2s ease",
+                          display: "flex",
+                          flexDirection: "column",
+                          minHeight: "240px",
+                          cursor: "pointer",
+                        }}
+                      >
+                        <img
+                          loading="lazy"
+                          src={video.thumbnail_url}
+                          style={{
+                            width: "100%",
+                            height: window.innerWidth <= 768 ? "120px" : "100%",
+                            aspectRatio: "16 / 9",
+                            borderRadius: "12px",
+                            objectFit: "cover",
+                            background: "#000",
+                            pointerEvents: "none",
+                          }}
+                        />
+                        <div
+                          className="video-info"
+                          style={{
+                            padding: "12px",
+                            textAlign: "left",
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: "6px",
+                          }}
+                        >
+                          <h3
+                            style={{
+                              fontSize: "16px",
+                              margin: 0,
+                              color: "#ffbb66",
+                              textOverflow: "ellipsis",
+                              overflow: "hidden",
+                              display: "-webkit-box",
+                              WebkitLineClamp: "2",
+                              WebkitBoxOrient: "vertical",
+                            }}
+                          >
+                            {video.title || video.autor}
+                          </h3>
+                          <p
+                            style={{
+                              fontSize: "14px",
+                              color: "#ccc",
+                              margin: 0,
+                              textOverflow: "ellipsis",
+                              overflow: "hidden",
+                              display: "-webkit-box",
+                              WebkitLineClamp: "1",
+                              WebkitBoxOrient: "vertical",
+                            }}
+                          >
+                            {video.autor}
+                          </p>
+                          <span
+                            style={{
+                              fontSize: "12px",
+                              color: "#888",
+                              textTransform: "uppercase",
+                            }}
+                          >
+                            {Array.isArray(video.categoria)
+                              ? video.categoria.join(", ")
+                              : video.categoria}
+                          </span>
+                        </div>
+                      </div>
+                    </a>
+                  ))}
+                </div>
+                {filtered.length > 0 && (
+                  <div
+                    className="pagination"
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      gap: "12px",
+                      flexWrap: "wrap",
+                      width: "100%",
+                      maxWidth: "800px",
+                      margin: "0 auto",
+                    }}
+                  >
+                    <button
+                      onClick={() => handlePageChange(1)}
+                      disabled={currentPage === 1}
+                      style={{
+                        padding: "10px 16px",
+                        background: currentPage === 1 ? "#1f1f1f" : "#333",
+                        color: "#fff",
+                        border: "1px solid #444",
+                        borderRadius: "8px",
+                        cursor: currentPage === 1 ? "not-allowed" : "pointer",
+                      }}
+                    >
+                      Início
+                    </button>
+                    <button
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      disabled={currentPage === 1}
+                      style={{
+                        padding: "10px 18px",
+                        background: currentPage === 1 ? "#1f1f1f" : "#333",
+                        color: "#fff",
+                        border: "1px solid #444",
+                        borderRadius: "999px",
+                        cursor: currentPage === 1 ? "not-allowed" : "pointer",
+                      }}
+                    >
+                      Anterior
+                    </button>
+                    {pageNumbers.map((page) => (
+                      <button
+                        key={page}
+                        onClick={() => handlePageChange(page)}
+                        style={{
+                          padding: "10px 16px",
+                          background:
+                            currentPage === page ? "#ff8533" : "#1f1f1f",
+                          color: currentPage === page ? "#fff" : "#aaa",
+                          border: "1px solid #333",
+                          borderRadius: "8px",
+                          cursor: "pointer",
+                          minWidth: "48px",
+                        }}
+                      >
+                        {page}
+                      </button>
+                    ))}
+                    <button
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      disabled={currentPage === pageCount}
+                      style={{
+                        padding: "10px 18px",
+                        background:
+                          currentPage === pageCount ? "#1f1f1f" : "#333",
+                        color: "#fff",
+                        border: "1px solid #444",
+                        borderRadius: "999px",
+                        cursor:
+                          currentPage === pageCount ? "not-allowed" : "pointer",
+                      }}
+                    >
+                      Próxima
+                    </button>
+                    <button
+                      onClick={() => handlePageChange(pageCount)}
+                      disabled={currentPage === pageCount}
+                      style={{
+                        padding: "10px 16px",
+                        background:
+                          currentPage === pageCount ? "#1f1f1f" : "#333",
+                        color: "#fff",
+                        border: "1px solid #444",
+                        borderRadius: "8px",
+                        cursor:
+                          currentPage === pageCount ? "not-allowed" : "pointer",
+                      }}
+                    >
+                      Fim
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </>
       )}
     </div>
   );
 }
-

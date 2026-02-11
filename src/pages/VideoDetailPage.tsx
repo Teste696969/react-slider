@@ -26,6 +26,8 @@ export function VideoDetailPage({ videos }: { videos: VideoItem[] }) {
   const { music } = useFetchMusic();
 
   const isMobile = useIsMobile();
+  console.log("Videos recebidos:", videos);
+  console.log("ID da URL:", videoId);
 
   useEffect(() => {
     window.scrollTo({

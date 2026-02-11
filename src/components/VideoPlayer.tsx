@@ -6,6 +6,7 @@ import React, {
   useState,
 } from "react";
 import type { VideoItem } from "../types/video";
+import screenfull from "screenfull";
 
 type VideoPlayerProps = {
   videos: VideoItem[];
@@ -260,32 +261,15 @@ export function VideoPlayer({
     }
   }, [currentIndex, videos.length, isRandom, loadIndex, onNext]);
 
-  const toggleFullscreen = useCallback(async () => {
-    const container = containerRef.current;
-    if (!container) return;
+  const toggleFullscreen = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    e?.preventDefault();
 
-    try {
-      if (!document.fullscreenElement) {
-        await container.requestFullscreen();
-        // Trava em landscape (horizontal) no Android/Chrome
-        if (window.screen.orientation && "lock" in window.screen.orientation) {
-          await (window.screen.orientation as any)
-            .lock("landscape-primary")
-            .catch(() => {});
-        }
-      } else {
-        if (
-          window.screen.orientation &&
-          "unlock" in window.screen.orientation
-        ) {
-          window.screen.orientation.unlock();
-        }
-        await document.exitFullscreen();
-      }
-    } catch (err) {
-      console.error("Erro ao alternar fullscreen:", err);
-    }
-  }, []);
+    const container = containerRef.current;
+    if (!container || !screenfull.isEnabled) return;
+
+    screenfull.toggle(container);
+  };
 
   const onKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -450,8 +434,16 @@ export function VideoPlayer({
         display: "flex",
         flexDirection: "column",
         gap: "16px",
-        minHeight: window.innerWidth <= 768 ? "400px" : "auto",
-        maxHeight: window.innerWidth <= 768 ? "400px" : "900px",
+        minHeight: isFullscreen
+          ? "100vh"
+          : window.innerWidth <= 768
+            ? "400px"
+            : "auto",
+        maxHeight: isFullscreen
+          ? "100vh"
+          : window.innerWidth <= 768
+            ? "400px"
+            : "900px",
         width: "100%",
         margin: "0 auto",
         padding: window.innerWidth <= 768 ? "0" : "0 clamp(12px, 4vw, 24px)",
@@ -550,7 +542,10 @@ export function VideoPlayer({
             >
               <i className="fa-solid fa-repeat"></i>
             </button>
-            <button className="full-screen-btn" onClick={toggleFullscreen}>
+            <button
+              className="full-screen-btn"
+              onClick={(e) => toggleFullscreen(e)}
+            >
               <i className="fa-solid fa-expand"></i>
             </button>
           </div>

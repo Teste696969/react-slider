@@ -7,6 +7,7 @@ import { useIsMobile } from "../hooks/useMobile";
 export function GalleryPage({ videos }: { videos: VideoItem[] }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const isMobile = useIsMobile();
 
   const itemsPerPage = 20;
   const maxVisiblePages = 6;
@@ -76,8 +77,6 @@ export function GalleryPage({ videos }: { videos: VideoItem[] }) {
       setCurrentPage(page);
     }
   };
-
-  const isMobile = useIsMobile();
 
   return (
     <div

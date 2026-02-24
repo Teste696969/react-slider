@@ -128,6 +128,18 @@ export function MainNavbar({ videos }: MainNavbarProps) {
         >
           Galeria Favs
         </Link>
+        <Link
+          to="/favorites"
+          style={{
+            color: location.pathname === "/favorites"
+              ? "#ffbb66"
+              : "#f8f9fa",
+            textDecoration: "none",
+            fontWeight: location.pathname === "/favorites" ? 600 : 500,
+          }}
+        >
+          A Favoritar
+        </Link>
       </div>
       <form
         onSubmit={onSubmit}

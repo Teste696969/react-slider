@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { VideoPlayer } from "../components/VideoPlayer";
 import type { VideoItem } from "../types/video";
 import { useFetchMusic } from "../hooks/useFetchMusic";
@@ -10,7 +10,9 @@ import { useIsMobile } from "../hooks/useMobile";
 export function VideoDetailPage({ videos }: { videos: VideoItem[] }) {
   const { videoId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const isMobileLayout = useIsMobile();
+  const isFromFavs = location.pathname.startsWith("/video-fav");
 
   // Find current video
   const currentVideo = useMemo(() => {
@@ -72,6 +74,7 @@ export function VideoDetailPage({ videos }: { videos: VideoItem[] }) {
             hiddenPrevious
             hiddenButtons
             containerStyle={{ width: "100%" }}
+            preFavoritedIds={isFromFavs ? videos.map((v) => Number(v.id)) : []}
           />
         </div>
         {music.length > 0 && (

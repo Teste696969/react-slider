@@ -6,6 +6,7 @@ import React, {
   useState,
 } from "react";
 import type { VideoItem } from "../types/video";
+import { useFavorites } from "../hooks/useFavorites";
 
 type VideoPlayerProps = {
   videos: VideoItem[];
@@ -20,6 +21,7 @@ type VideoPlayerProps = {
   containerStyle?: React.CSSProperties;
   videoStyle?: React.CSSProperties;
   onVideoChange?: (video: VideoItem) => void;
+  preFavoritedIds?: number[]; // IDs pré-favoritados (de videosFavs)
 };
 
 export function VideoPlayer({
@@ -35,10 +37,12 @@ export function VideoPlayer({
   containerStyle,
   videoStyle,
   onVideoChange,
+  preFavoritedIds = [],
 }: VideoPlayerProps) {
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [isRandom, setIsRandom] = useState<boolean>(autoRandom);
   const [isLoop, setIsLoop] = useState<boolean>(autoLoop);
+  const { isFavorite, addFavorite, removeFavorite } = useFavorites();
   const isHiddenLoop = hiddenLoop;
   const isHiddenRandom = hiddenRandom;
   const isHiddenNext = hiddenNext;
@@ -103,6 +107,8 @@ export function VideoPlayer({
       onVideoChange(current);
     }
   }, [current, onVideoChange]);
+
+  const currentVideoId = Number(current?.id || 0);
 
   const [duration, setDuration] = useState<number>(0);
   const [currentTime, setCurrentTime] = useState<number>(0);
@@ -802,6 +808,34 @@ export function VideoPlayer({
             <h6 className="video-title">{current?.categoria || ""}</h6>
           </div>
         </div>
+        <button
+          className="favorites-btn"
+          onClick={() => {
+            if (current?.id) {
+              const videoId = Number(current.id);
+              if (isFavorite(videoId)) {
+                removeFavorite(videoId);
+              } else {
+                addFavorite(videoId);
+              }
+            }
+          }}
+          style={{
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            fontSize: "24px",
+            padding: "8px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: isFavorite(currentVideoId) || preFavoritedIds.includes(currentVideoId) ? "#ff6b6b" : "#888",
+            transition: "color 0.2s ease",
+          }}
+          title={isFavorite(currentVideoId) || preFavoritedIds.includes(currentVideoId) ? "Remover dos favoritos" : "Adicionar aos favoritos"}
+        >
+          <i className={`fa-${isFavorite(currentVideoId) || preFavoritedIds.includes(currentVideoId) ? "solid" : "regular"} fa-heart`}></i>
+        </button>
       </div>
     </section>
   );

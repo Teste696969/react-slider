@@ -140,7 +140,7 @@ export function GalleryPageFavs({ videos }: { videos: VideoItem[] }) {
                 gridTemplateColumns: isMobile
                   ? "repeat(2, 1fr)"
                   : "repeat(4, 1fr)",
-                gap: "1px",
+                gap: "16px",
                 margin: "0",
                 justifyItems: "center",
                 justifyContent: "center",
@@ -149,39 +149,40 @@ export function GalleryPageFavs({ videos }: { videos: VideoItem[] }) {
               {paginatedVideos.map((video, index) => (
                 <a
                   key={`${video.id || video.url}-${index}`}
-                  href={ location.pathname.startsWith("/g-favs") ? `/video-fav/${video.id}` : `/video/${video.id}`}
+                  href={
+                    location.pathname.startsWith("/g-favs")
+                      ? `/video-fav/${video.id}`
+                      : `/video/${video.id}`
+                  }
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{
                     textDecoration: "none",
-                    color: "inherit",
-                    width: "100%",
-                    maxWidth: "300px",
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
+                    color: "white",
+                    backgroundColor: "#222",
+                    borderRadius: "8px",
+                    minWidth: "230px",
+                    overflow: "hidden",
+                    cursor: "pointer",
+                    transition: "transform 0.2s, box-shadow 0.2s",
+                    position: "relative",
                   }}
                   onMouseEnter={() => handleCardEnter(video.id)}
                   onMouseLeave={() => handleCardLeave()}
                   onFocus={() => handleCardEnter(video.id)}
                   onBlur={() => handleCardLeave()}
                 >
+                  {/* Thumbnail (placeholder) */}
                   <div
-                    className="video-card"
                     style={{
                       width: "100%",
-                      overflow: "hidden",
-                      maxWidth: "300px",
-                      backgroundColor: "transparent",
-                      transform:
-                        hoveredId === video.id
-                          ? "translateY(-6px)"
-                          : "translateY(0)",
-                      transition: "transform 0.2s ease, box-shadow 0.2s ease",
+                      aspectRatio: "16 / 9",
+                      backgroundColor: "#111",
                       display: "flex",
-                      flexDirection: "column",
-                      minHeight: "240px",
-                      cursor: "pointer",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      position: "relative",
+                      overflow: "hidden",
                     }}
                   >
                     <img
@@ -196,56 +197,43 @@ export function GalleryPageFavs({ videos }: { videos: VideoItem[] }) {
                         pointerEvents: "none",
                       }}
                     />
-                    <div
-                      className="video-info"
+                  </div>
+
+                  {/* Info */}
+                  <div style={{ padding: "12px" }}>
+                    <h3
                       style={{
-                        padding: "12px",
-                        textAlign: "left",
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: "6px",
+                        margin: "0 0 8px 0",
+                        fontSize: "14px",
+                        fontWeight: "bold",
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
                       }}
                     >
-                      <h3
-                        style={{
-                          fontSize: "16px",
-                          margin: 0,
-                          color: "#ffbb66",
-                          textOverflow: "ellipsis",
-                          overflow: "hidden",
-                          display: "-webkit-box",
-                          WebkitLineClamp: "2",
-                          WebkitBoxOrient: "vertical",
-                        }}
-                      >
-                        {video.title || video.autor}
-                      </h3>
-                      <p
-                        style={{
-                          fontSize: "14px",
-                          color: "#ccc",
-                          margin: 0,
-                          textOverflow: "ellipsis",
-                          overflow: "hidden",
-                          display: "-webkit-box",
-                          WebkitLineClamp: "1",
-                          WebkitBoxOrient: "vertical",
-                        }}
-                      >
-                        {video.autor}
-                      </p>
-                      <span
-                        style={{
-                          fontSize: "12px",
-                          color: "#888",
-                          textTransform: "uppercase",
-                        }}
-                      >
-                        {Array.isArray(video.categoria)
-                          ? video.categoria.join(", ")
-                          : video.categoria}
-                      </span>
-                    </div>
+                      {video.categoria || "Sem título"}
+                    </h3>
+                    <p
+                      style={{
+                        margin: 0,
+                        fontSize: "12px",
+                        color: "#aaa",
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
+                      {video.autor || "Desconhecido"}
+                    </p>
+                    <p
+                      style={{
+                        margin: "4px 0 0 0",
+                        fontSize: "11px",
+                        color: "#888",
+                      }}
+                    >
+                      ID: {video.id}
+                    </p>
                   </div>
                 </a>
               ))}

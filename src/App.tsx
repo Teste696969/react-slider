@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Route, Routes, useLocation } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { MainNavbar } from "./components/MainNavbar";
 import { useFetchVideos } from "./hooks/useFetchVideos";
 import { lazy, Suspense } from "react";
@@ -20,6 +20,12 @@ const GalleryPage = lazy(() =>
 const VideoDetailPage = lazy(() =>
   import("./pages/VideoDetailPage").then((module) => ({
     default: module.VideoDetailPage,
+  })),
+);
+
+const FavoritesPage = lazy(() =>
+  import("./pages/FavoritesPage").then((module) => ({
+    default: module.FavoritesPage,
   })),
 );
 
@@ -47,13 +53,10 @@ interface AppContentProps {
 }
 
 function AppContent({ videos, videosFavs, error, errorFavs }: AppContentProps) {
-  const location = useLocation();
-  
-  const currentVideos = location.pathname.includes("fav") ? videosFavs : videos;
 
   return (
     <>
-      <MainNavbar videos={currentVideos} />
+      <MainNavbar videos={videos} />
       
       {/* Exibição de Erros */}
       {(error || errorFavs) && (
@@ -67,6 +70,7 @@ function AppContent({ videos, videosFavs, error, errorFavs }: AppContentProps) {
         <Routes>
           <Route path="/gallery" element={<GalleryPage videos={videos} />} />
           <Route path="/g-favs" element={<GalleryPage videos={videosFavs} />} />
+          <Route path="/favorites" element={<FavoritesPage videos={videos} />} />
           <Route path="/video/:videoId" element={<VideoDetailPage videos={videos} />} />
           <Route path="/video-fav/:videoId" element={<VideoDetailPage videos={videosFavs} />} />
           <Route path="/" element={<PlayerPage videos={videos} />} />

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { FilterSection } from "../components/FilterSection";
 import { useVideoFilters } from "../hooks/useVideoFilters";
 import type { VideoItem } from "../types/video";
@@ -6,7 +6,6 @@ import { useIsMobile } from "../hooks/useMobile";
 
 export function GalleryPageFavs({ videos }: { videos: VideoItem[] }) {
   const [currentPage, setCurrentPage] = useState(1);
-  const [hoveredId, setHoveredId] = useState<string | null>(null);
   const isMobile = useIsMobile();
 
   const itemsPerPage = 20;
@@ -63,14 +62,6 @@ export function GalleryPageFavs({ videos }: { videos: VideoItem[] }) {
 
     return Array.from({ length: end - start + 1 }, (_, index) => start + index);
   }, [currentPage, pageCount, maxVisiblePages]);
-
-  const handleCardEnter = useCallback((id: string | number) => {
-    setHoveredId(String(id));
-  }, []);
-
-  const handleCardLeave = useCallback(() => {
-    setHoveredId(null);
-  }, []);
 
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= pageCount) {
@@ -167,10 +158,6 @@ export function GalleryPageFavs({ videos }: { videos: VideoItem[] }) {
                     transition: "transform 0.2s, box-shadow 0.2s",
                     position: "relative",
                   }}
-                  onMouseEnter={() => handleCardEnter(video.id)}
-                  onMouseLeave={() => handleCardLeave()}
-                  onFocus={() => handleCardEnter(video.id)}
-                  onBlur={() => handleCardLeave()}
                 >
                   {/* Thumbnail (placeholder) */}
                   <div

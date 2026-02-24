@@ -6,7 +6,7 @@ import { useIsMobile } from "../hooks/useMobile";
 
 export function GalleryPageFavs({ videos }: { videos: VideoItem[] }) {
   const [currentPage, setCurrentPage] = useState(1);
-  const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [ setHoveredId] = useState<string | null>(null);
   const isMobile = useIsMobile();
 
   const itemsPerPage = 20;

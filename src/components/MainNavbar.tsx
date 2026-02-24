@@ -32,7 +32,7 @@ export function MainNavbar({ videos }: MainNavbarProps) {
   );
 
   const selectVideo = (video: VideoItem) => {
-    const urlVideo = `/video/${video.id}`;
+    const urlVideo = location.pathname.startsWith("/g-favs") ? `/video-fav/${video.id}` : `/video/${video.id}`;
     window.open(urlVideo, "_blank", "noopener,noreferrer");
     setQuery("");
     setIsOpen(false);
@@ -95,6 +95,16 @@ export function MainNavbar({ videos }: MainNavbarProps) {
           Player
         </Link>
         <Link
+          to="/favs"
+          style={{
+            color: location.pathname === "/favs" ? "#ffbb66" : "#f8f9fa",
+            textDecoration: "none",
+            fontWeight: location.pathname === "/favs" ? 600 : 500,
+          }}
+        >
+          Player Favs
+        </Link>
+        <Link
           to="/gallery"
           style={{
             color: location.pathname.startsWith("/gallery")
@@ -105,6 +115,18 @@ export function MainNavbar({ videos }: MainNavbarProps) {
           }}
         >
           Galeria
+        </Link>
+        <Link
+          to="/g-favs"
+          style={{
+            color: location.pathname.startsWith("/g-favs")
+              ? "#ffbb66"
+              : "#f8f9fa",
+            textDecoration: "none",
+            fontWeight: location.pathname.startsWith("/g-favs") ? 600 : 500,
+          }}
+        >
+          Galeria Favs
         </Link>
       </div>
       <form

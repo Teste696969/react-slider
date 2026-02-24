@@ -4,7 +4,7 @@ import { useVideoFilters } from "../hooks/useVideoFilters";
 import type { VideoItem } from "../types/video";
 import { useIsMobile } from "../hooks/useMobile";
 
-export function GalleryPage({ videos }: { videos: VideoItem[] }) {
+export function GalleryPageFavs({ videos }: { videos: VideoItem[] }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const isMobile = useIsMobile();
@@ -149,7 +149,7 @@ export function GalleryPage({ videos }: { videos: VideoItem[] }) {
               {paginatedVideos.map((video, index) => (
                 <a
                   key={`${video.id || video.url}-${index}`}
-                  href={`/video/${video.id}`}
+                  href={ location.pathname.startsWith("/g-favs") ? `/video-fav/${video.id}` : `/video/${video.id}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{

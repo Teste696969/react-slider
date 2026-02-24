@@ -44,12 +44,12 @@ export function VideoPlayer({
   const isHiddenNext = hiddenNext;
   const isHiddenPrevious = hiddenPrevious;
   const isHiddenButtons = hiddenButtons;
-  const [, setQueue] = useState<number[]>([]);
   const randomHistory = useRef<number[]>([]);
+  const availableIndices = useRef<number[]>([]);
 
   useEffect(() => {
     setCurrentIndex(0);
-    setQueue(Array.from({ length: videos.length }, (_, i) => i));
+    availableIndices.current = Array.from({ length: videos.length }, (_, i) => i);
     randomHistory.current = [];
   }, [videos]);
 
@@ -161,8 +161,14 @@ export function VideoPlayer({
   const onPrev = useCallback(() => {
     if (isRandom) {
       if (randomHistory.current.length > 1) {
-        randomHistory.current.pop();
-        const prev = randomHistory.current.pop() as number;
+        // Remove o vídeo atual do histórico
+        const current = randomHistory.current.pop();
+        // Se o vídeo atual foi removido, volta à pool de disponíveis
+        if (current !== undefined && !availableIndices.current.includes(current)) {
+          availableIndices.current.push(current);
+        }
+        // Pega o vídeo anterior
+        const prev = randomHistory.current[randomHistory.current.length - 1];
         loadIndex(prev);
       }
     } else {
@@ -172,18 +178,28 @@ export function VideoPlayer({
 
   const onNext = useCallback(() => {
     if (isRandom) {
-      setQueue((q) => {
-        const pool = q.length
-          ? q
-          : Array.from({ length: videos.length }, (_, i) => i);
-        const ri = Math.floor(Math.random() * pool.length);
-        const nextIdx = pool[ri];
-        const newPool = pool.slice();
-        newPool.splice(ri, 1);
-        randomHistory.current.push(nextIdx);
-        loadIndex(nextIdx);
-        return newPool;
-      });
+      // Se a pool está vazia, reinicializa com todos os índices
+      if (availableIndices.current.length === 0) {
+        availableIndices.current = Array.from(
+          { length: videos.length },
+          (_, i) => i
+        );
+      }
+
+      // Seleciona um índice aleatório da pool disponível
+      const randomPosition = Math.floor(
+        Math.random() * availableIndices.current.length
+      );
+      const nextIdx = availableIndices.current[randomPosition];
+
+      // Remove o índice da pool para evitar repetições
+      availableIndices.current.splice(randomPosition, 1);
+
+      // Registra no histórico
+      randomHistory.current.push(nextIdx);
+
+      // Carrega o vídeo
+      loadIndex(nextIdx);
     } else {
       const next = currentIndex < videos.length - 1 ? currentIndex + 1 : 0;
       loadIndex(next);

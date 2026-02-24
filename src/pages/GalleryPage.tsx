@@ -6,7 +6,7 @@ import { useIsMobile } from "../hooks/useMobile";
 
 export function GalleryPageFavs({ videos }: { videos: VideoItem[] }) {
   const [currentPage, setCurrentPage] = useState(1);
-  const [ setHoveredId] = useState<string | null>(null);
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
   const isMobile = useIsMobile();
 
   const itemsPerPage = 20;
@@ -64,8 +64,8 @@ export function GalleryPageFavs({ videos }: { videos: VideoItem[] }) {
     return Array.from({ length: end - start + 1 }, (_, index) => start + index);
   }, [currentPage, pageCount, maxVisiblePages]);
 
-  const handleCardEnter = useCallback((id: string) => {
-    setHoveredId(id);
+  const handleCardEnter = useCallback((id: string | number) => {
+    setHoveredId(String(id));
   }, []);
 
   const handleCardLeave = useCallback(() => {

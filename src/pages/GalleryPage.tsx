@@ -1,12 +1,23 @@
 import { useEffect, useMemo, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { FilterSection } from "../components/FilterSection";
 import { useVideoFilters } from "../hooks/useVideoFilters";
 import type { VideoItem } from "../types/video";
 import { useIsMobile } from "../hooks/useMobile";
 
 export function GalleryPageFavs({ videos }: { videos: VideoItem[] }) {
-  const [currentPage, setCurrentPage] = useState(1);
+  const location = useLocation();
+  const navigate = useNavigate();
   const isMobile = useIsMobile();
+  
+  // Obter página da URL, padrão é 1
+  const getPageFromUrl = () => {
+    const params = new URLSearchParams(location.search);
+    const pageParam = params.get("page");
+    return pageParam ? Math.max(1, parseInt(pageParam, 10)) : 1;
+  };
+  
+  const [currentPage, setCurrentPageState] = useState(getPageFromUrl());
 
   const itemsPerPage = 20;
   const maxVisiblePages = 6;
@@ -28,11 +39,36 @@ export function GalleryPageFavs({ videos }: { videos: VideoItem[] }) {
     addCategory,
   } = useVideoFilters(videos);
 
+  // Sincronizar página da URL quando mudar
+  useEffect(() => {
+    const pageFromUrl = getPageFromUrl();
+    setCurrentPageState(pageFromUrl);
+  }, [location.search]);
+
+  // Scroll para o topo quando mudar de página
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [currentPage]);
+
   const totalPages = useMemo(
     () => Math.ceil(filtered.length / itemsPerPage),
     [filtered.length, itemsPerPage],
   );
   const pageCount = Math.max(1, totalPages);
+
+  // Função para mudar página e atualizar URL
+  const setCurrentPage = (page: number) => {
+    if (page >= 1 && page <= pageCount) {
+      setCurrentPageState(page);
+      const params = new URLSearchParams();
+      if (page > 1) {
+        params.set("page", page.toString());
+        navigate(`${location.pathname}?${params.toString()}`, { replace: true });
+      } else {
+        navigate(location.pathname, { replace: true });
+      }
+    }
+  };
 
   const paginatedVideos = useMemo(() => {
     return filtered.slice(
@@ -41,9 +77,14 @@ export function GalleryPageFavs({ videos }: { videos: VideoItem[] }) {
     );
   }, [currentPage, itemsPerPage, filtered]);
 
+  // Ajustar página se estiver fora do intervalo após filtros mudarem
   useEffect(() => {
-    setCurrentPage((prev) => Math.min(prev, pageCount));
-  }, [pageCount]);
+    if (currentPage > pageCount && pageCount >= 1) {
+      setCurrentPageState(1);
+      navigate(location.pathname, { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pageCount, location.pathname]);
 
   const pageNumbers = useMemo(() => {
     if (pageCount <= maxVisiblePages) {

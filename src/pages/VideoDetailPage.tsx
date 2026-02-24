@@ -174,8 +174,8 @@ export function VideoDetailPage({ videos }: { videos: VideoItem[] }) {
       {!isMobileLayout && (
         <div
           style={{
-            maxWidth: "17%",
-            minWidth: "17%",
+            maxWidth: "25%",
+            minWidth: "25%",
             margin: "auto 0 auto",
           }}
         >

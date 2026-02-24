@@ -188,20 +188,21 @@ export function GalleryPageFavs({ videos }: { videos: VideoItem[] }) {
                   </div>
 
                   {/* Info */}
-                  <div style={{ padding: "12px" }}>
-                    <h3
-                      style={{
-                        margin: "0 0 8px 0",
-                        fontSize: "14px",
-                        fontWeight: "bold",
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                      }}
-                    >
-                      {video.categoria || "Sem título"}
-                    </h3>
-                    <p
+                  <div style={{ padding: "12px", display: "flex", flexDirection: "column", gap: "6px" }}>
+                      <h3
+                        style={{
+                          fontSize: "16px",
+                          margin: 0,
+                          textOverflow: "ellipsis",
+                          overflow: "hidden",
+                          display: "-webkit-box",
+                          WebkitLineClamp: "2",
+                          WebkitBoxOrient: "vertical",
+                        }}
+                      >
+                        {video.title || video.autor}
+                      </h3>
+                       <p
                       style={{
                         margin: 0,
                         fontSize: "12px",
@@ -213,15 +214,20 @@ export function GalleryPageFavs({ videos }: { videos: VideoItem[] }) {
                     >
                       {video.autor || "Desconhecido"}
                     </p>
-                    <p
+                    <h4
                       style={{
-                        margin: "4px 0 0 0",
-                        fontSize: "11px",
-                        color: "#888",
+                        margin: 0,
+                        fontSize: "12px",
+                        color: "#aaa",
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
                       }}
                     >
-                      ID: {video.id}
-                    </p>
+                      {video.categoria || "Sem título"}
+                    </h4>
+                   
+                  
                   </div>
                 </a>
               ))}

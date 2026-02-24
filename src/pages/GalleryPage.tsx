@@ -139,7 +139,7 @@ export function GalleryPage({ videos }: { videos: VideoItem[] }) {
                 display: "grid",
                 gridTemplateColumns: isMobile
                   ? "repeat(2, 1fr)"
-                  : "repeat(5, 1fr)",
+                  : "repeat(4, 1fr)",
                 gap: "1px",
                 margin: "0",
                 justifyItems: "center",

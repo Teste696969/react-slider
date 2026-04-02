@@ -174,7 +174,7 @@ export function MainNavbar({ videos }: MainNavbarProps) {
                   >
                     Player
                   </Link>
-                  <Link
+                  {/* <Link
                     to="/favs"
                     onClick={() => setMobileMenuOpen(false)}
                     style={{
@@ -194,7 +194,7 @@ export function MainNavbar({ videos }: MainNavbarProps) {
                     }}
                   >
                     Player Favoritos
-                  </Link>
+                  </Link> */}
                   <Link
                     to="/gallery"
                     onClick={() => setMobileMenuOpen(false)}
@@ -219,7 +219,7 @@ export function MainNavbar({ videos }: MainNavbarProps) {
                   >
                     Galeria
                   </Link>
-                  <Link
+                  {/* <Link
                     to="/g-favs"
                     onClick={() => setMobileMenuOpen(false)}
                     style={{
@@ -242,8 +242,8 @@ export function MainNavbar({ videos }: MainNavbarProps) {
                     }}
                   >
                     Galeria Favoritos
-                  </Link>
-                  <Link
+                  </Link> */}
+                  {/* <Link
                     to="/favorites"
                     onClick={() => setMobileMenuOpen(false)}
                     style={{
@@ -265,7 +265,7 @@ export function MainNavbar({ videos }: MainNavbarProps) {
                     }}
                   >
                     A Favoritar
-                  </Link>
+                  </Link> */}
                 </div>
               </div>
             </>
@@ -484,7 +484,7 @@ export function MainNavbar({ videos }: MainNavbarProps) {
               >
                 Player
               </Link>
-              <Link
+              {/* <Link
                 to="/favs"
                 style={{
                   color: location.pathname === "/favs" ? "#ffbb66" : "#f8f9fa",
@@ -493,7 +493,7 @@ export function MainNavbar({ videos }: MainNavbarProps) {
                 }}
               >
                 Player Favs
-              </Link>
+              </Link> */}
               <Link
                 to="/gallery"
                 style={{
@@ -506,7 +506,7 @@ export function MainNavbar({ videos }: MainNavbarProps) {
               >
                 Galeria
               </Link>
-              <Link
+              {/* <Link
                 to="/g-favs"
                 style={{
                   color: location.pathname.startsWith("/g-favs")
@@ -517,8 +517,8 @@ export function MainNavbar({ videos }: MainNavbarProps) {
                 }}
               >
                 Galeria Favs
-              </Link>
-              <Link
+              </Link> */}
+              {/* <Link
                 to="/favorites"
                 style={{
                   color: location.pathname === "/favorites"
@@ -529,7 +529,7 @@ export function MainNavbar({ videos }: MainNavbarProps) {
                 }}
               >
                 ♥ Favoritos
-              </Link>
+              </Link> */}
             </div>
 
             <form

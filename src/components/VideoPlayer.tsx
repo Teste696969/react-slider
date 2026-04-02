@@ -87,6 +87,8 @@ export function VideoPlayer({
   const [volume, setVolume] = useState<number>(1);
   const [showControls, setShowControls] = useState<boolean>(true);
   const [playbackRate, setPlaybackRate] = useState<number>(1);
+  const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
+  const [isVerticalMobile, setIsVerticalMobile] = useState<boolean>(false);
   const hideTimeout = useRef<number | null>(null);
   const isPointerInside = useRef<boolean>(false);
   const isSeekingRef = useRef<boolean>(false);
@@ -116,6 +118,42 @@ export function VideoPlayer({
     }
   }, [playbackRate]);
 
+  useEffect(() => {
+    // Detecta se é mobile e está em modo vertical
+    const checkVerticalMobile = () => {
+      const isMobile = window.innerWidth < 768;
+      const isVertical = window.innerHeight > window.innerWidth;
+      setIsVerticalMobile(isMobile && isVertical);
+    };
+
+    checkVerticalMobile();
+    window.addEventListener('resize', checkVerticalMobile);
+    window.addEventListener('orientationchange', checkVerticalMobile);
+
+    return () => {
+      window.removeEventListener('resize', checkVerticalMobile);
+      window.removeEventListener('orientationchange', checkVerticalMobile);
+    };
+  }, []);
+
+  useEffect(() => {
+    // Fecha menu ao clicar fora
+    const handleClickOutside = (e: MouseEvent) => {
+      const menuButton = document.getElementById('menu-button');
+      if (isMenuOpen && !menuButton?.contains(e.target as Node)) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    if (isMenuOpen) {
+      document.addEventListener('click', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [isMenuOpen]);
+
   // Cleanup double-click timers on unmount
   useEffect(() => {
     return () => {
@@ -135,16 +173,20 @@ export function VideoPlayer({
 
     // Inicializa a metadata de media session
     if (current && navigator.mediaSession) {
+      const artwork: MediaImage[] = [
+        {
+          src: 'https://via.placeholder.com/96',
+          sizes: '96x96',
+          type: 'image/png',
+        },
+      ];
+      const categoria = Array.isArray(current.categoria)
+        ? current.categoria[0]
+        : current.categoria;
       navigator.mediaSession.metadata = new MediaMetadata({
-        title: current.categoria || 'Vídeo',
+        title: categoria || 'Vídeo',
         artist: current.autor || 'Desconhecido',
-        artwork: [
-          {
-            src: 'https://via.placeholder.com/96',
-            sizes: '96x96',
-            type: 'image/png',
-          },
-        ],
+        artwork: artwork,
       });
     }
   }, [current, onVideoChange]);
@@ -655,7 +697,7 @@ export function VideoPlayer({
               <div className="thumb-indicator"></div>
             </div>
           </div>
-          <div className="controls">
+          <div className="controls" style={{ flexWrap: isVerticalMobile ? 'nowrap' : undefined }}>
             <button
               style={{ display: isHiddenPrevious ? "none" : "inline-block" }}
               id="prev-button"
@@ -701,7 +743,7 @@ export function VideoPlayer({
               <div className="total-time">{formatDuration(duration)}</div>
             </div>
             <button
-              style={{ display: isHiddenRandom ? "none" : "inline-block" }}
+              style={{ display: isHiddenRandom || isVerticalMobile ? "none" : "inline-block" }}
               id="random-button"
               className={isRandom ? "active-random" : ""}
               onClick={() => setIsRandom((v) => !v)}
@@ -709,13 +751,146 @@ export function VideoPlayer({
               <i className="fa-solid fa-shuffle"></i>
             </button>
             <button
-              style={{ display: isHiddenLoop ? "none" : "inline-block" }}
+              style={{ display: isHiddenLoop || isVerticalMobile ? "none" : "inline-block" }}
               id="loop-button"
               className={isLoop ? "active-loop" : ""}
               onClick={() => setIsLoop((v) => !v)}
             >
               <i className="fa-solid fa-repeat"></i>
             </button>
+            {isVerticalMobile && (
+              <div style={{ position: "relative", display: "inline-block", width: 40, height: 40 }}>
+                <button
+                  id="menu-button"
+                  className={`menu-button ${isMenuOpen ? 'open' : ''}`}
+                  onClick={() => setIsMenuOpen(!isMenuOpen)}
+                  style={{
+                    background: isMenuOpen ? "#ff8533" : "rgba(255, 255, 255, 0.1)",
+                    border: "1px solid " + (isMenuOpen ? "#ff8533" : "rgba(255, 255, 255, 0.2)"),
+                    color: "#fff",
+                    fontSize: "18px",
+                    cursor: "pointer",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: "0.5rem",
+                    height: "40px",
+                    width: "40px",
+                    borderRadius: "8px",
+                    opacity: isMenuOpen ? 1 : 0.8,
+                    transition: "all 160ms cubic-bezier(0.4, 0, 0.2, 1)",
+                    boxShadow: isMenuOpen ? "0 0 12px rgba(255, 133, 51, 0.5)" : "none",
+                    transform: isMenuOpen ? 'scale(1.03)' : 'none',
+                  }}
+                >
+                  <i className="fa-solid fa-ellipsis-vertical"></i>
+                </button>
+                {isMenuOpen && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      bottom: "100%",
+                      right: "0",
+                      display: "flex",  
+                      flexDirection: "column",
+                      gap: "8px",
+                      background: "rgba(20, 20, 30, 0.98)",
+                      border: "1px solid rgba(255, 133, 51, 0.3)",
+                      borderRadius: "8px",
+                      padding: "8px",
+                      width: "60px",
+                      zIndex: 1000,
+                      marginBottom: "8px",
+                      boxShadow: "0 8px 24px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.05)",
+                      backdropFilter: "blur(10px)",
+                    }}
+                  >
+                    <button
+                      onClick={() => {
+                        setIsRandom((v) => !v);
+                        setIsMenuOpen(false);
+                      }}
+                      style={{
+                        width: "100%",
+                        padding: "12px 16px",
+                        background: isRandom ? "#ff8533" : "transparent",
+                        border: "1px solid " + (isRandom ? "#ff8533" : "rgba(255, 255, 255, 0.1)"),
+                        color: "#fff",
+                        textAlign: "left",
+                        cursor: "pointer",
+                        fontSize: "14px",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "10px",
+                        transition: "all 200ms cubic-bezier(0.4, 0, 0.2, 1)",
+                        borderRadius: "6px",
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!isRandom) {
+                          e.currentTarget.style.background = "rgba(255, 133, 51, 0.2)";
+                          e.currentTarget.style.borderColor = "rgba(255, 133, 51, 0.5)";
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isRandom) {
+                          e.currentTarget.style.background = "transparent";
+                          e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.1)";
+                        }
+                      }}
+                    >
+                      <i 
+                        className="fa-solid fa-shuffle" 
+                        style={{ 
+                          color: isRandom ? "#fff" : "#888",
+                          textShadow: isRandom ? "0 0 8px rgba(255, 133, 51, 0.6)" : "none"
+                        }}
+                      ></i>
+                    </button>
+                    <button
+                      onClick={() => {
+                        setIsLoop((v) => !v);
+                        setIsMenuOpen(false);
+                      }}
+                      style={{
+                        width: "100%",
+                        padding: "12px 16px",
+                        background: isLoop ? "#ff8533" : "transparent",
+                        border: "1px solid " + (isLoop ? "#ff8533" : "rgba(255, 255, 255, 0.1)"),
+                        color: "#fff",
+                        textAlign: "left",
+                        cursor: "pointer",
+                        fontSize: "14px",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "10px",
+                        transition: "all 200ms cubic-bezier(0.4, 0, 0.2, 1)",
+                        borderRadius: "6px",
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!isLoop) {
+                          e.currentTarget.style.background = "rgba(255, 133, 51, 0.2)";
+                          e.currentTarget.style.borderColor = "rgba(255, 133, 51, 0.5)";
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isLoop) {
+                          e.currentTarget.style.background = "transparent";
+                          e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.1)";
+                        }
+                      }}
+                    >
+                      <i 
+                        className="fa-solid fa-repeat" 
+                        style={{ 
+                          color: isLoop ? "#fff" : "#888",
+                          textShadow: isLoop ? "0 0 8px rgba(255, 133, 51, 0.6)" : "none"
+                        }}
+                      ></i>
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
             <button
               id="playback-rate-button"
               className="playback-rate-btn"

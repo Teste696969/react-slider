@@ -182,7 +182,6 @@ video {
   background: #ff8533;
   color: #fff;
   opacity: 1;
-  transform: scale(1.1);
   border-color: #ff8533;
   box-shadow: 0 0 12px rgba(255, 133, 51, 0.5);
 }

@@ -104,6 +104,16 @@ export function VideoPlayer({
   useEffect(() => {
     if (!videoRef.current) return;
     videoRef.current.playbackRate = playbackRate;
+    
+    // Sincroniza com media session
+    if (navigator.mediaSession) {
+      const v = videoRef.current;
+      navigator.mediaSession.setPositionState?.({
+        duration: v.duration || 0,
+        playbackRate: playbackRate,
+        position: v.currentTime || 0,
+      });
+    }
   }, [playbackRate]);
 
   // Cleanup double-click timers on unmount
@@ -122,6 +132,21 @@ export function VideoPlayer({
     if (current && onVideoChange) {
       onVideoChange(current);
     }
+
+    // Inicializa a metadata de media session
+    if (current && navigator.mediaSession) {
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: current.categoria || 'Vídeo',
+        artist: current.autor || 'Desconhecido',
+        artwork: [
+          {
+            src: 'https://via.placeholder.com/96',
+            sizes: '96x96',
+            type: 'image/png',
+          },
+        ],
+      });
+    }
   }, [current, onVideoChange]);
 
   const currentVideoId = Number(current?.id || 0);
@@ -137,20 +162,56 @@ export function VideoPlayer({
     const v = videoRef.current;
     if (!v) return;
     setCurrentTime(v.currentTime);
+
+    // Atualiza o estado e posição de reprodução na sessão de mídia
+    if (navigator.mediaSession) {
+      navigator.mediaSession.playbackState = v.paused ? 'paused' : 'playing';
+      
+      // Atualiza posição de reprodução
+      navigator.mediaSession.setPositionState?.({
+        duration: v.duration || 0,
+        playbackRate: v.playbackRate || 1,
+        position: v.currentTime || 0,
+      });
+    }
   }, []);
 
   const onLoadedData = useCallback(() => {
     const v = videoRef.current;
     if (!v) return;
     setDuration(v.duration || 0);
+
+    // Atualiza posição quando o vídeo é carregado
+    if (navigator.mediaSession && v.duration) {
+      navigator.mediaSession.setPositionState?.({
+        duration: v.duration,
+        playbackRate: v.playbackRate || 1,
+        position: 0,
+      });
+    }
   }, []);
 
   const onPlay = useCallback(() => {
     setIsPlaying(true);
+    if (navigator.mediaSession) {
+      navigator.mediaSession.playbackState = 'playing';
+      
+      const v = videoRef.current;
+      if (v?.duration) {
+        navigator.mediaSession.setPositionState?.({
+          duration: v.duration,
+          playbackRate: v.playbackRate || 1,
+          position: v.currentTime || 0,
+        });
+      }
+    }
   }, []);
 
   const onPause = useCallback(() => {
     setIsPlaying(false);
+    if (navigator.mediaSession) {
+      navigator.mediaSession.playbackState = 'paused';
+    }
   }, []);
 
   const onToggleMute = useCallback(() => {
@@ -223,6 +284,62 @@ export function VideoPlayer({
       loadIndex(next);
     }
   }, [currentIndex, videos.length, isRandom, loadIndex]);
+
+  useEffect(() => {
+    if (!navigator.mediaSession) return;
+
+    const video = videoRef.current;
+    if (!video) return;
+
+    // Define a ação de play
+    navigator.mediaSession.setActionHandler('play', () => {
+      video.play();
+    });
+
+    // Define a ação de pause
+    navigator.mediaSession.setActionHandler('pause', () => {
+      video.pause();
+    });
+
+    // Define a ação de próxima faixa
+    navigator.mediaSession.setActionHandler('nexttrack', () => {
+      onNext();
+    });
+
+    // Define a ação de faixa anterior
+    navigator.mediaSession.setActionHandler('previoustrack', () => {
+      onPrev();
+    });
+
+    // Define a ação de skip forward (avançar ~10s por padrão)
+    navigator.mediaSession.setActionHandler('seekforward', (details) => {
+      const skipTime = details.seekOffset || 10;
+      video.currentTime = Math.min(video.currentTime + skipTime, video.duration);
+    });
+
+    // Define a ação de skip backward (voltar ~10s por padrão)
+    navigator.mediaSession.setActionHandler('seekbackward', (details) => {
+      const skipTime = details.seekOffset || 10;
+      video.currentTime = Math.max(video.currentTime - skipTime, 0);
+    });
+
+    // Define a ação de seek (quando o usuário pula para um tempo específico)
+    navigator.mediaSession.setActionHandler('seekto', (details) => {
+      if (details.seekTime !== undefined) {
+        video.currentTime = Math.max(0, Math.min(details.seekTime, video.duration));
+      }
+    });
+
+    return () => {
+      navigator.mediaSession.setActionHandler('play', null);
+      navigator.mediaSession.setActionHandler('pause', null);
+      navigator.mediaSession.setActionHandler('nexttrack', null);
+      navigator.mediaSession.setActionHandler('previoustrack', null);
+      navigator.mediaSession.setActionHandler('seekforward', null);
+      navigator.mediaSession.setActionHandler('seekbackward', null);
+      navigator.mediaSession.setActionHandler('seekto', null);
+    };
+  }, [onNext, onPrev]);
 
   // Handle rewind button clicks (single click = -5s, double click = previous video)
   const handleRewindClick = useCallback(() => {
@@ -315,25 +432,31 @@ export function VideoPlayer({
     (e: KeyboardEvent) => {
       const active = document.activeElement?.tagName.toLowerCase();
       if (active === "input" || active === "button") return;
-      switch (e.key.toLowerCase()) {
+      
+      const key = e.key?.toLowerCase() || e.code?.toLowerCase() || '';
+      
+      switch (key) {
         case " ":
         case "k":
+        case "mediaplaypause":
           e.preventDefault();
           onTogglePlay();
           break;
         case "f":
           e.preventDefault();
-          toggleFullscreen(); // Usa a nova função que trava a tela
+          toggleFullscreen();
           break;
         case "m":
           onToggleMute();
           break;
         case "arrowleft":
         case "j":
+          e.preventDefault();
           if (videoRef.current) videoRef.current.currentTime -= 5;
           break;
         case "arrowright":
         case "l":
+          e.preventDefault();
           if (videoRef.current) videoRef.current.currentTime += 5;
           break;
         case ">":
@@ -341,9 +464,17 @@ export function VideoPlayer({
           e.preventDefault();
           onTogglePlaybackRate();
           break;
+        case "mediatracknext":
+          e.preventDefault();
+          onNext();
+          break;
+        case "mediatrackprevious":
+          e.preventDefault();
+          onPrev();
+          break;
       }
     },
-    [onToggleMute, onTogglePlay, onTogglePlaybackRate],
+    [onToggleMute, onTogglePlay, onTogglePlaybackRate, onNext, onPrev, toggleFullscreen],
   );
 
   useEffect(() => {

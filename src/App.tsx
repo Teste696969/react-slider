@@ -66,17 +66,15 @@ function AppContent({ videos, videosFavs, error, errorFavs }: AppContentProps) {
         </div>
       )}
 
-      
-
       <Suspense fallback={<LoadingFallback />}>
         <Routes>
           <Route path="/gallery" element={<GalleryPage videos={videos} />} />
-          {/* <Route path="/g-favs" element={<GalleryPage videos={videosFavs} />} /> */}
-          {/* <Route path="/favorites" element={<FavoritesPage videos={videos} />} /> */}
+          <Route path="/g-favs" element={<GalleryPage videos={videosFavs} />} />
+          <Route path="/favorites" element={<FavoritesPage videos={videos} />} />
           <Route path="/video/:videoId" element={<VideoDetailPage videos={videos} />} />
-          {/* <Route path="/video-fav/:videoId" element={<VideoDetailPage videos={videosFavs} />} /> */}
+          <Route path="/video-fav/:videoId" element={<VideoDetailPage videos={videosFavs} />} />
           <Route path="/" element={<PlayerPage videos={videos} />} />
-          {/* <Route path="/favs" element={<PlayerPage videos={videosFavs} />} /> */}
+          <Route path="/favs" element={<PlayerPage videos={videosFavs} />} />
         </Routes>
       </Suspense>
     </>

@@ -80,6 +80,17 @@ export function VideoPlayer({
   const containerRef = useRef<HTMLDivElement | null>(null);
   const controlsRef = useRef<HTMLDivElement | null>(null);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
+  const [duration, setDuration] = useState<number>(0);
+  const [currentTime, setCurrentTime] = useState<number>(0);
+  const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const [muted, setMuted] = useState<boolean>(false);
+  const [volume, setVolume] = useState<number>(1);
+  const [showControls, setShowControls] = useState<boolean>(true);
+  const [playbackRate, setPlaybackRate] = useState<number>(1);
+  const hideTimeout = useRef<number | null>(null);
+  const isPointerInside = useRef<boolean>(false);
+  const isSeekingRef = useRef<boolean>(false);
+  const [isScrubbing, setIsScrubbing] = useState<boolean>(false);
   const rewindClickTimeoutRef = useRef<number | null>(null);
   const forwardClickTimeoutRef = useRef<number | null>(null);
   const rewindClickCountRef = useRef<number>(0);
@@ -89,6 +100,11 @@ export function VideoPlayer({
     if (!videoRef.current) return;
     videoRef.current.loop = isLoop;
   }, [isLoop]);
+
+  useEffect(() => {
+    if (!videoRef.current) return;
+    videoRef.current.playbackRate = playbackRate;
+  }, [playbackRate]);
 
   // Cleanup double-click timers on unmount
   useEffect(() => {
@@ -109,17 +125,6 @@ export function VideoPlayer({
   }, [current, onVideoChange]);
 
   const currentVideoId = Number(current?.id || 0);
-
-  const [duration, setDuration] = useState<number>(0);
-  const [currentTime, setCurrentTime] = useState<number>(0);
-  const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const [muted, setMuted] = useState<boolean>(false);
-  const [volume, setVolume] = useState<number>(1);
-  const [showControls, setShowControls] = useState<boolean>(true);
-  const hideTimeout = useRef<number | null>(null);
-  const isPointerInside = useRef<boolean>(false);
-  const isSeekingRef = useRef<boolean>(false);
-  const [isScrubbing, setIsScrubbing] = useState<boolean>(false);
 
   const onTogglePlay = useCallback(() => {
     const v = videoRef.current;
@@ -163,6 +168,13 @@ export function VideoPlayer({
     setVolume(val);
     setMuted(v.muted);
   }, []);
+
+  const onTogglePlaybackRate = useCallback(() => {
+    const rates = [1, 1.15, 1.25, 1.5];
+    const currentIndex = rates.indexOf(playbackRate);
+    const nextIndex = (currentIndex + 1) % rates.length;
+    setPlaybackRate(rates[nextIndex]);
+  }, [playbackRate]);
 
   const onPrev = useCallback(() => {
     if (isRandom) {
@@ -289,19 +301,7 @@ export function VideoPlayer({
     try {
       if (!document.fullscreenElement) {
         await container.requestFullscreen();
-        // Trava em landscape (horizontal) no Android/Chrome
-        if (window.screen.orientation && "lock" in window.screen.orientation) {
-          await (window.screen.orientation as any)
-            .lock("landscape-primary")
-            .catch(() => {});
-        }
       } else {
-        if (
-          window.screen.orientation &&
-          "unlock" in window.screen.orientation
-        ) {
-          window.screen.orientation.unlock();
-        }
         await document.exitFullscreen();
       }
     } catch (err) {
@@ -309,43 +309,7 @@ export function VideoPlayer({
     }
   }, []);
 
-  useEffect(() => {
-    const lockOrientation = async () => {
-      if (window.screen.orientation && "lock" in window.screen.orientation) {
-        try {
-          await (window.screen.orientation as any).lock("landscape-primary");
-        } catch (err) {
-          console.log("Não foi possível travar a orientação:", err);
-        }
-      }
-    };
 
-    const handleOrientationChange = () => {
-      lockOrientation();
-    };
-
-    // Tenta travar imediatamente
-    lockOrientation();
-
-    // Monitora mudanças de orientação
-    window.addEventListener("orientationchange", handleOrientationChange);
-    if (window.screen.orientation) {
-      window.screen.orientation.addEventListener(
-        "change",
-        handleOrientationChange,
-      );
-    }
-
-    return () => {
-      window.removeEventListener("orientationchange", handleOrientationChange);
-      if (window.screen.orientation) {
-        window.screen.orientation.removeEventListener(
-          "change",
-          handleOrientationChange,
-        );
-      }
-    };
-  }, [isFullscreen]);
 
   const onKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -372,9 +336,14 @@ export function VideoPlayer({
         case "l":
           if (videoRef.current) videoRef.current.currentTime += 5;
           break;
+        case ">":
+        case ".":
+          e.preventDefault();
+          onTogglePlaybackRate();
+          break;
       }
     },
-    [onToggleMute, onTogglePlay],
+    [onToggleMute, onTogglePlay, onTogglePlaybackRate],
   );
 
   useEffect(() => {
@@ -615,6 +584,16 @@ export function VideoPlayer({
               onClick={() => setIsLoop((v) => !v)}
             >
               <i className="fa-solid fa-repeat"></i>
+            </button>
+            <button
+              id="playback-rate-button"
+              className="playback-rate-btn"
+              onClick={onTogglePlaybackRate}
+              title={`Velocidade: ${playbackRate}x`}
+            >
+              <span style={{ fontSize: "12px", fontWeight: "bold" }}>
+                {playbackRate}x
+              </span>
             </button>
             <button className="full-screen-btn" onClick={toggleFullscreen}>
               <i className="fa-solid fa-expand"></i>
